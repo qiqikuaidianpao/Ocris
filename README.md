@@ -41,22 +41,39 @@ AIAnswerTool/
 - .NET Framework 4.7.2 或更高版本
 - Visual Studio 2019 或更高版本（开发）
 
-### 编译运行
+### 从GitHub获取项目
 
 1. 克隆项目到本地
 ```bash
-git clone https://github.com/yourusername/AIAnswerTool.git
+git clone https://github.com/qiqikuaidianpao/AIAnswerTool.git
 cd AIAnswerTool
 ```
 
-2. 使用PowerShell编译
+2. 恢复NuGet包（如果需要）
+```bash
+nuget restore
+# 或者在Visual Studio中右键解决方案 -> 还原NuGet包
+```
+
+### 编译运行
+
+**方法一：使用PowerShell脚本**
 ```powershell
 .\build.ps1
 ```
 
-3. 运行程序
+**方法二：使用Visual Studio**
+1. 双击 `AIAnswerTool.sln` 打开项目
+2. 按 `Ctrl+Shift+B` 编译项目
+3. 按 `F5` 运行程序
+
+**方法三：使用命令行**
 ```bash
-cd bin\Debug
+# 编译项目
+msbuild AIAnswerTool.sln /p:Configuration=Release
+
+# 运行程序
+cd bin\Release
 AIAnswerTool.exe
 ```
 
