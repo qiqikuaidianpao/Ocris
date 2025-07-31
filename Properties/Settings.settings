@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="AIAnswerTool.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="ApiToken" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="ApiBaseUrl" Type="System.String" Scope="User">
+      <Value Profile="(Default)">https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generation</Value>
+    </Setting>
+    <Setting Name="HotkeyModifier" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Ctrl+Alt</Value>
+    </Setting>
+    <Setting Name="HotkeyKey" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Q</Value>
+    </Setting>
+    <Setting Name="AutoSaveScreenshots" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="ScreenshotPath" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Screenshots</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

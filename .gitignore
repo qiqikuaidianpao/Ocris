@@ -1,0 +1,66 @@
+# Visual Studio 生成的文件
+bin/
+obj/
+*.exe
+*.dll
+*.pdb
+*.cache
+*.tmp
+*.log
+
+# Visual Studio 用户特定文件
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# 构建结果
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+
+# NuGet 包
+*.nupkg
+packages/
+
+# 测试结果
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+
+# 临时文件
+*.tmp
+*.temp
+*.cache
+
+# 日志文件
+*.log
+debug.log
+
+# IDE 配置文件
+.vs/
+.vscode/
+
+# 备份文件
+*.backup
+*.bak
+
+# 系统文件
+Thumbs.db
+.DS_Store
+
+# 项目特定文件
+ui参考/
+1.jpg
+
+# OCR 模型文件（如果很大的话）
+# inference/
+
+# 配置文件中的敏感信息（如果有的话）
+# App.config
