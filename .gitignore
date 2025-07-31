@@ -23,6 +23,13 @@ x64/
 x86/
 bld/
 [Bb]in/
+# Allow precompiled files for direct execution
+!bin/Debug/AIAnswerTool.exe
+!bin/Debug/AIAnswerTool.exe.config
+!bin/Debug/config.json
+!bin/Debug/*.dll
+!bin/Debug/inference/
+!bin/Debug/*/
 [Oo]bj/
 [Ll]og/
 

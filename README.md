@@ -52,20 +52,32 @@ AIAnswerTool/
 git clone https://github.com/qiqikuaidianpao/AIAnswerTool.git
 cd AIAnswerTool
 
-# 2. 构建项目（自动处理所有依赖）
-.\build.ps1
-
-# 3. 运行程序
+# 2. 直接运行（推荐）
 .\bin\Debug\AIAnswerTool.exe
 ```
 
-> ✅ **保证**: 执行以上命令后，程序可直接运行，无需额外配置
+> ✅ **一键运行**: 克隆后直接执行exe，无需构建步骤
+> 📦 **预编译**: 仓库已包含编译好的程序和所有依赖文件
+
+#### 备选方案：重新构建
+
+如果直接运行遇到问题，可以重新构建：
+
+```powershell
+# 重新构建项目
+.\build.ps1
+
+# 运行程序
+.\bin\Debug\AIAnswerTool.exe
+```
 
 ### 构建说明
 
-#### 自动构建（推荐）
+> 💡 **提示**: 通常情况下无需重新构建，仓库已包含预编译版本
 
-项目包含自动化构建脚本，会处理所有依赖和配置：
+#### 自动构建
+
+如需重新构建，项目包含自动化构建脚本：
 
 ```powershell
 # 在项目根目录执行
@@ -121,7 +133,7 @@ cd AIAnswerTool
 
 ### 输出结构
 
-成功构建后，`bin\Debug\` 目录包含：
+`bin\Debug\` 目录已包含完整的预编译程序：
 
 ```
 bin\Debug\
@@ -137,13 +149,20 @@ bin\Debug\
 
 ### 分发部署
 
-要分发给其他用户：
+**方式一：直接使用仓库版本（推荐）**
+
+1. 克隆仓库：`git clone https://github.com/qiqikuaidianpao/AIAnswerTool.git`
+2. 确保目标机器安装了 .NET Framework 4.8
+3. 直接运行 `bin\Debug\AIAnswerTool.exe`
+
+**方式二：手动分发**
 
 1. 将整个 `bin\Debug\` 文件夹复制到目标机器
 2. 确保目标机器安装了 .NET Framework 4.8
 3. 直接运行 `AIAnswerTool.exe`
 
-> 📦 **打包提示**: 可以使用 7-Zip 或 WinRAR 将 `bin\Debug\` 文件夹打包为压缩包分发
+> 📦 **优势**: 仓库已包含完整预编译版本，无需构建步骤
+> 🚀 **即用**: 克隆后立即可用，节省时间和环境配置
 
 
 
@@ -160,9 +179,19 @@ bin\Debug\
 
 #### 常见问题
 
+**Q: 为什么可以直接运行exe而不需要构建？**
+```
+A: 仓库已包含完整的预编译版本，包括：
+   - 编译好的 AIAnswerTool.exe
+   - 所有依赖的DLL文件（40+个文件）
+   - OCR模型文件和配置
+   - 多语言资源文件
+```
+
 **Q: 编译时提示找不到DLL文件**
 ```
-A: 执行 .\build.ps1 脚本，它会自动复制所有必需的DLL到正确位置
+A: 通常无需重新编译，直接使用预编译版本即可
+   如需重新构建：执行 .\build.ps1 脚本会自动处理所有依赖
 ```
 
 **Q: 运行时提示缺少 .NET Framework**

@@ -1,0 +1,201 @@
+[2025-07-31 15:13:24.194] [INFO] 日志服务初始化成功
+[2025-07-31 15:13:24.194] [INFO] 日志目录: D:\BaiduNetdiskDownload\KaKaDaWPF1_0_0_3\AIAnswerTool\bin\Debug\Logs
+[2025-07-31 15:13:24.194] [INFO] 当前日志级别: 0
+[2025-07-31 15:13:24.194] [INFO] 日志目录已更新为: D:\BaiduNetdiskDownload\KaKaDaWPF1_0_0_3\AIAnswerTool\bin\Debug\Logs
+[2025-07-31 15:13:24.221] [INFO] AliCloudAIService.IsConfigured被调用: ApiKey=有值, BaseUrl=有值, Result=True
+[2025-07-31 15:13:24.221] [INFO] 阿里云配置加载: ApiKey=已设置, BaseUrl=https://dashscope.aliyuncs.com/compatible-mode/v1, IsConfigured=True
+[2025-07-31 15:13:24.226] [INFO] AliCloudAIService.IsConfigured被调用: ApiKey=有值, BaseUrl=有值, Result=True
+[2025-07-31 15:13:24.226] [INFO] 阿里云配置加载: ApiKey=已设置, BaseUrl=https://dashscope.aliyuncs.com/compatible-mode/v1, IsConfigured=True
+[2025-07-31 15:13:24.227] [INFO] MainViewModel initialized
+[2025-07-31 15:13:34.998] [INFO] 开始截图操作
+[2025-07-31 15:13:38.419] [INFO] 截图成功
+[2025-07-31 15:13:38.422] [INFO] 正在初始化OCR引擎...
+[2025-07-31 15:13:38.423] [INFO] OCR模型路径配置: det=D:\BaiduNetdiskDownload\KaKaDaWPF1_0_0_3\AIAnswerTool\bin\Debug\inference\ch_PP-OCRv4_det_infer, cls=D:\BaiduNetdiskDownload\KaKaDaWPF1_0_0_3\AIAnswerTool\bin\Debug\inference\ch_ppocr_mobile_v2.0_cls_infer, rec=D:\BaiduNetdiskDownload\KaKaDaWPF1_0_0_3\AIAnswerTool\bin\Debug\inference\ch_PP-OCRv4_rec_infer, keys=D:\BaiduNetdiskDownload\KaKaDaWPF1_0_0_3\AIAnswerTool\bin\Debug\inference\ppocr_keys.txt
+[2025-07-31 15:13:38.423] [INFO] 正在创建PaddleOCR引擎...
+[2025-07-31 15:13:38.758] [ERROR] OCR引擎初始化失败: 无法加载 DLL“PaddleOCR”: 找不到指定的模块。 (异常来自 HRESULT:0x8007007E)。
+Exception: System.DllNotFoundException: 无法加载 DLL“PaddleOCR”: 找不到指定的模块。 (异常来自 HRESULT:0x8007007E)。
+   在 PaddleOCRSharp.PaddleOCREngine.Initialize(String det_infer, String cls_infer, String rec_infer, String keys, OCRParameter parameter)
+   在 PaddleOCRSharp.PaddleOCREngine..ctor(OCRModelConfig config, OCRParameter parameter)
+   在 AIAnswerTool.Services.OCRService.<InitializeAsync>d__2.MoveNext() 位置 d:\BaiduNetdiskDownload\KaKaDaWPF1_0_0_3\AIAnswerTool\Services\OCRService.cs:行号 117
+[2025-07-31 15:16:10.012] [INFO] 日志服务初始化成功
+[2025-07-31 15:16:10.012] [INFO] 日志目录: D:\BaiduNetdiskDownload\KaKaDaWPF1_0_0_3\AIAnswerTool\bin\Debug\Logs
+[2025-07-31 15:16:10.012] [INFO] 当前日志级别: 0
+[2025-07-31 15:16:10.012] [INFO] 日志目录已更新为: D:\BaiduNetdiskDownload\KaKaDaWPF1_0_0_3\AIAnswerTool\bin\Debug\Logs
+[2025-07-31 15:16:10.029] [INFO] AliCloudAIService.IsConfigured被调用: ApiKey=有值, BaseUrl=有值, Result=True
+[2025-07-31 15:16:10.029] [INFO] 阿里云配置加载: ApiKey=已设置, BaseUrl=https://dashscope.aliyuncs.com/compatible-mode/v1, IsConfigured=True
+[2025-07-31 15:16:10.029] [INFO] AliCloudAIService.IsConfigured被调用: ApiKey=有值, BaseUrl=有值, Result=True
+[2025-07-31 15:16:10.029] [INFO] 阿里云配置加载: ApiKey=已设置, BaseUrl=https://dashscope.aliyuncs.com/compatible-mode/v1, IsConfigured=True
+[2025-07-31 15:16:10.030] [INFO] MainViewModel initialized
+[2025-07-31 15:16:15.585] [INFO] 开始截图操作
+[2025-07-31 15:16:17.758] [INFO] 截图成功
+[2025-07-31 15:16:17.761] [INFO] 正在初始化OCR引擎...
+[2025-07-31 15:16:17.762] [INFO] OCR模型路径配置: det=D:\BaiduNetdiskDownload\KaKaDaWPF1_0_0_3\AIAnswerTool\bin\Debug\inference\ch_PP-OCRv4_det_infer, cls=D:\BaiduNetdiskDownload\KaKaDaWPF1_0_0_3\AIAnswerTool\bin\Debug\inference\ch_ppocr_mobile_v2.0_cls_infer, rec=D:\BaiduNetdiskDownload\KaKaDaWPF1_0_0_3\AIAnswerTool\bin\Debug\inference\ch_PP-OCRv4_rec_infer, keys=D:\BaiduNetdiskDownload\KaKaDaWPF1_0_0_3\AIAnswerTool\bin\Debug\inference\ppocr_keys.txt
+[2025-07-31 15:16:17.762] [INFO] 正在创建PaddleOCR引擎...
+[2025-07-31 15:16:19.004] [INFO] PaddleOCR引擎创建成功，正在进行初始化测试...
+[2025-07-31 15:16:19.024] [INFO] 正在进行OCR引擎测试...
+[2025-07-31 15:16:19.205] [INFO] OCR引擎测试完成，检测到 1 个文本块
+[2025-07-31 15:16:19.205] [INFO] OCR引擎初始化成功
+[2025-07-31 15:16:19.208] [INFO] 开始OCR文字识别...
+[2025-07-31 15:16:19.225] [INFO] Saved grayscale image for debugging.
+[2025-07-31 15:16:19.228] [INFO] Saved contrast image for debugging.
+[2025-07-31 15:16:19.264] [INFO] Saved sharpened image for debugging.
+[2025-07-31 15:16:19.271] [INFO] Saved scaled image for debugging.
+[2025-07-31 15:16:19.389] [INFO] OCR识别完成，识别到 1 个文本块
+[2025-07-31 15:16:19.389] [INFO] 文本块 1: 内容='智能解答', 置信度=0.997
+[2025-07-31 15:16:19.399] [INFO] 最终OCR结果: 文本='智能解答', 置信度=0.997
+[2025-07-31 15:16:19.400] [INFO] OCR识别成功，识别文字: 智能解答
+[2025-07-31 15:17:18.248] [INFO] 开始截图操作
+[2025-07-31 15:17:22.284] [INFO] 截图成功
+[2025-07-31 15:17:22.284] [INFO] 开始OCR文字识别...
+[2025-07-31 15:17:22.308] [INFO] Saved grayscale image for debugging.
+[2025-07-31 15:17:22.310] [INFO] Saved contrast image for debugging.
+[2025-07-31 15:17:22.381] [INFO] Saved sharpened image for debugging.
+[2025-07-31 15:17:22.389] [INFO] Saved scaled image for debugging.
+[2025-07-31 15:17:22.513] [INFO] OCR识别完成，识别到 3 个文本块
+[2025-07-31 15:17:22.513] [INFO] 文本块 1: 内容='>>', 置信度=0.755
+[2025-07-31 15:17:22.513] [INFO] 文本块 2: 内容='了', 置信度=0.162
+[2025-07-31 15:17:22.513] [INFO] 文本块 3: 内容='所有书签', 置信度=1.000
+[2025-07-31 15:17:22.513] [INFO] 最终OCR结果: 文本='>>
+了
+所有书签', 置信度=0.639
+[2025-07-31 15:17:22.514] [INFO] OCR识别成功，识别文字: >>
+了
+所有书签
+[2025-07-31 15:17:43.762] [INFO] 开始截图操作
+[2025-07-31 15:17:49.081] [INFO] 截图成功
+[2025-07-31 15:17:49.081] [INFO] 开始OCR文字识别...
+[2025-07-31 15:17:49.223] [INFO] Saved grayscale image for debugging.
+[2025-07-31 15:17:49.227] [INFO] Saved contrast image for debugging.
+[2025-07-31 15:17:49.702] [INFO] Saved sharpened image for debugging.
+[2025-07-31 15:17:49.744] [INFO] Saved scaled image for debugging.
+[2025-07-31 15:17:50.262] [INFO] OCR识别完成，识别到 11 个文本块
+[2025-07-31 15:17:50.263] [INFO] 文本块 1: 内容='AI答题辅助工具v1.0', 置信度=0.952
+[2025-07-31 15:17:50.263] [INFO] 文本块 2: 内容='柚子皮AI答题助手', 置信度=0.985
+[2025-07-31 15:17:50.263] [INFO] 文本块 3: 内容='快捷键：Ctrl+Alt+Q唤醒窗口Ctd+At+S快速截图', 置信度=0.943
+[2025-07-31 15:17:50.263] [INFO] 文本块 4: 内容=' 题目内容', 置信度=0.985
+[2025-07-31 15:17:50.263] [INFO] 文本块 5: 内容=' 智能解答', 置信度=0.934
+[2025-07-31 15:17:50.263] [INFO] 文本块 6: 内容='自题目类型：', 置信度=0.883
+[2025-07-31 15:17:50.263] [INFO] 文本块 7: 内容='请输入题目并点击“获取', 置信度=0.932
+[2025-07-31 15:17:50.263] [INFO] 文本块 8: 内容='答案"按钮...', 置信度=0.845
+[2025-07-31 15:17:50.263] [INFO] 文本块 9: 内容='>', 置信度=0.640
+[2025-07-31 15:17:50.263] [INFO] 文本块 10: 内容='了', 置信度=0.999
+[2025-07-31 15:17:50.263] [INFO] 文本块 11: 内容='所有书签', 置信度=1.000
+[2025-07-31 15:17:50.263] [INFO] 最终OCR结果: 文本='AI答题辅助工具v1.0
+柚子皮AI答题助手
+快捷键：Ctrl+Alt+Q唤醒窗口Ctd+At+S快速截图
+题目内容
+智能解答
+自题目类型：
+请输入题目并点击“获取
+答案"按钮...
+>
+了
+所有书签', 置信度=0.918
+[2025-07-31 15:17:50.263] [INFO] OCR识别成功，识别文字: AI答题辅助工具v1.0
+柚子皮AI答题助手
+快捷键：Ctrl+Alt+Q唤醒窗口Ctd+At+S快速截图
+题目内容
+智能解答
+自题目类型：
+请输入题目并点击“获取
+答案"按钮...
+>
+了
+所有书签
+[2025-07-31 15:17:58.278] [INFO] Content cleared
+[2025-07-31 15:18:00.065] [INFO] 开始截图操作
+[2025-07-31 15:18:04.195] [INFO] 截图成功
+[2025-07-31 15:18:04.195] [INFO] 开始OCR文字识别...
+[2025-07-31 15:18:04.218] [INFO] Saved grayscale image for debugging.
+[2025-07-31 15:18:04.219] [INFO] Saved contrast image for debugging.
+[2025-07-31 15:18:04.290] [INFO] Saved sharpened image for debugging.
+[2025-07-31 15:18:04.298] [INFO] Saved scaled image for debugging.
+[2025-07-31 15:18:04.444] [INFO] OCR识别完成，识别到 4 个文本块
+[2025-07-31 15:18:04.444] [INFO] 文本块 1: 内容='>>', 置信度=0.703
+[2025-07-31 15:18:04.444] [INFO] 文本块 2: 内容='', 置信度=0.000
+[2025-07-31 15:18:04.444] [INFO] 文本块 3: 内容='一', 置信度=0.060
+[2025-07-31 15:18:04.444] [INFO] 文本块 4: 内容='所有书签', 置信度=1.000
+[2025-07-31 15:18:04.444] [INFO] 最终OCR结果: 文本='>>
+一
+所有书签', 置信度=0.588
+[2025-07-31 15:18:04.444] [INFO] OCR识别成功，识别文字: >>
+一
+所有书签
+[2025-07-31 15:18:12.196] [INFO] 开始截图操作
+[2025-07-31 15:18:15.735] [INFO] 截图成功
+[2025-07-31 15:18:15.735] [INFO] 开始OCR文字识别...
+[2025-07-31 15:18:15.750] [INFO] Saved grayscale image for debugging.
+[2025-07-31 15:18:15.752] [INFO] Saved contrast image for debugging.
+[2025-07-31 15:18:15.801] [INFO] Saved sharpened image for debugging.
+[2025-07-31 15:18:15.806] [INFO] Saved scaled image for debugging.
+[2025-07-31 15:18:15.905] [INFO] OCR识别完成，识别到 1 个文本块
+[2025-07-31 15:18:15.905] [INFO] 文本块 1: 内容='', 置信度=0.000
+[2025-07-31 15:18:15.905] [INFO] 最终OCR结果: 文本='', 置信度=0.000
+[2025-07-31 15:18:15.906] [INFO] OCR识别失败，未识别到文字
+[2025-07-31 15:18:29.429] [INFO] 开始截图操作
+[2025-07-31 15:18:34.250] [INFO] 截图成功
+[2025-07-31 15:18:34.250] [INFO] 开始OCR文字识别...
+[2025-07-31 15:18:34.357] [INFO] Saved grayscale image for debugging.
+[2025-07-31 15:18:34.362] [INFO] Saved contrast image for debugging.
+[2025-07-31 15:18:34.704] [INFO] Saved sharpened image for debugging.
+[2025-07-31 15:18:34.739] [INFO] Saved scaled image for debugging.
+[2025-07-31 15:18:35.135] [INFO] OCR识别完成，识别到 5 个文本块
+[2025-07-31 15:18:35.135] [INFO] 文本块 1: 内容='根据《中华人民共和国消防法》，需要建立单', 置信度=0.993
+[2025-07-31 15:18:35.135] [INFO] 文本块 2: 内容='位专职消防队的单位是（）。', 置信度=0.995
+[2025-07-31 15:18:35.135] [INFO] 文本块 3: 内容='A、小型民用机场', 置信度=0.998
+[2025-07-31 15:18:35.135] [INFO] 文本块 4: 内容='B、县级重点文物保护单位', 置信度=0.999
+[2025-07-31 15:18:35.136] [INFO] 文本块 5: 内容='C、 中型制衣公司', 置信度=0.957
+[2025-07-31 15:18:35.136] [INFO] 最终OCR结果: 文本='根据《中华人民共和国消防法》，需要建立单
+位专职消防队的单位是（）。
+A、小型民用机场
+B、县级重点文物保护单位
+C、 中型制衣公司', 置信度=0.989
+[2025-07-31 15:18:35.136] [INFO] OCR识别成功，识别文字: 根据《中华人民共和国消防法》，需要建立单
+位专职消防队的单位是（）。
+A、小型民用机场
+B、县级重点文物保护单位
+C、 中型制衣公司
+[2025-07-31 15:18:40.554] [INFO] AliCloudAIService.IsConfigured被调用: ApiKey=有值, BaseUrl=有值, Result=True
+[2025-07-31 15:18:40.554] [INFO] 开始处理问题: 根据《中华人民共和国消防法》，需要建立单
+位专职消防队的单位是（）。
+A、小型民用机场
+B、县级重点...
+[2025-07-31 15:18:40.555] [INFO] 发送AI请求，第 1 次尝试
+[2025-07-31 15:18:40.564] [INFO] AliCloudAIService.IsConfigured被调用: ApiKey=有值, BaseUrl=有值, Result=True
+[2025-07-31 15:18:40.564] [INFO] SendRequestAsync被调用: ApiKey=有值, BaseUrl=有值, IsConfigured=True
+[2025-07-31 15:18:40.564] [INFO] AliCloudAIService.IsConfigured被调用: ApiKey=有值, BaseUrl=有值, Result=True
+[2025-07-31 15:18:45.707] [INFO] 问题处理完成，响应长度: 528
+[2025-07-31 15:19:11.351] [INFO] Opening settings window
+[2025-07-31 18:23:50.479] [INFO] 日志服务初始化成功
+[2025-07-31 18:23:50.481] [INFO] 日志目录: D:\BaiduNetdiskDownload\KaKaDaWPF1_0_0_3\AIAnswerTool\bin\Debug\Logs
+[2025-07-31 18:23:50.481] [INFO] 当前日志级别: 0
+[2025-07-31 18:23:50.481] [INFO] 日志目录已更新为: D:\BaiduNetdiskDownload\KaKaDaWPF1_0_0_3\AIAnswerTool\bin\Debug\Logs
+[2025-07-31 18:23:50.499] [INFO] AliCloudAIService.IsConfigured被调用: ApiKey=有值, BaseUrl=有值, Result=True
+[2025-07-31 18:23:50.499] [INFO] 阿里云配置加载: ApiKey=已设置, BaseUrl=https://dashscope.aliyuncs.com/compatible-mode/v1, IsConfigured=True
+[2025-07-31 18:23:50.499] [INFO] AliCloudAIService.IsConfigured被调用: ApiKey=有值, BaseUrl=有值, Result=True
+[2025-07-31 18:23:50.499] [INFO] 阿里云配置加载: ApiKey=已设置, BaseUrl=https://dashscope.aliyuncs.com/compatible-mode/v1, IsConfigured=True
+[2025-07-31 18:23:50.500] [INFO] MainViewModel initialized
+[2025-07-31 18:25:14.708] [INFO] 开始截图操作
+[2025-07-31 18:25:16.658] [INFO] 截图成功
+[2025-07-31 18:25:16.663] [INFO] 正在初始化OCR引擎...
+[2025-07-31 18:25:16.664] [INFO] OCR模型路径配置: det=D:\BaiduNetdiskDownload\KaKaDaWPF1_0_0_3\AIAnswerTool\bin\Debug\inference\ch_PP-OCRv4_det_infer, cls=D:\BaiduNetdiskDownload\KaKaDaWPF1_0_0_3\AIAnswerTool\bin\Debug\inference\ch_ppocr_mobile_v2.0_cls_infer, rec=D:\BaiduNetdiskDownload\KaKaDaWPF1_0_0_3\AIAnswerTool\bin\Debug\inference\ch_PP-OCRv4_rec_infer, keys=D:\BaiduNetdiskDownload\KaKaDaWPF1_0_0_3\AIAnswerTool\bin\Debug\inference\ppocr_keys.txt
+[2025-07-31 18:25:16.664] [INFO] 正在创建PaddleOCR引擎...
+[2025-07-31 18:25:18.040] [INFO] PaddleOCR引擎创建成功，正在进行初始化测试...
+[2025-07-31 18:25:18.063] [INFO] 正在进行OCR引擎测试...
+[2025-07-31 18:25:18.293] [INFO] OCR引擎测试完成，检测到 1 个文本块
+[2025-07-31 18:25:18.293] [INFO] OCR引擎初始化成功
+[2025-07-31 18:25:18.297] [INFO] 开始OCR文字识别...
+[2025-07-31 18:25:18.316] [INFO] Saved grayscale image for debugging.
+[2025-07-31 18:25:18.318] [INFO] Saved contrast image for debugging.
+[2025-07-31 18:25:18.378] [INFO] Saved sharpened image for debugging.
+[2025-07-31 18:25:18.386] [INFO] Saved scaled image for debugging.
+[2025-07-31 18:25:18.535] [INFO] OCR识别完成，识别到 3 个文本块
+[2025-07-31 18:25:18.535] [INFO] 文本块 1: 内容='智能解答', 置信度=0.999
+[2025-07-31 18:25:18.535] [INFO] 文本块 2: 内容='请输入题目并点击“获取', 置信度=0.944
+[2025-07-31 18:25:18.535] [INFO] 文本块 3: 内容='m', 置信度=0.177
+[2025-07-31 18:25:18.557] [INFO] 最终OCR结果: 文本='智能解答
+请输入题目并点击“获取
+m', 置信度=0.707
+[2025-07-31 18:25:18.564] [INFO] OCR识别成功，识别文字: 智能解答
+请输入题目并点击“获取
+m
