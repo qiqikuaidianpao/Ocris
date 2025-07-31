@@ -49,33 +49,33 @@ git clone https://github.com/qiqikuaidianpao/AIAnswerTool.git
 cd AIAnswerTool
 ```
 
-2. 恢复NuGet包（如果需要）
-```bash
-nuget restore
-# 或者在Visual Studio中右键解决方案 -> 还原NuGet包
-```
-
 ### 编译运行
 
-**方法一：使用PowerShell脚本**
+**方法一：使用PowerShell脚本（推荐，自动处理依赖）**
 ```powershell
 .\build.ps1
 ```
+> 💡 **提示**：PowerShell脚本会自动处理NuGet包恢复和编译，无需手动操作
 
-**方法二：使用Visual Studio**
+**方法二：手动编译（适合高级用户）**
+```bash
+# 1. 恢复NuGet包
+nuget restore
+
+# 2. 编译项目
+msbuild AIAnswerTool.sln /p:Configuration=Release
+
+# 3. 运行程序
+cd bin\Release
+AIAnswerTool.exe
+```
+
+**方法三：使用Visual Studio**
 1. 双击 `AIAnswerTool.sln` 打开项目
 2. 按 `Ctrl+Shift+B` 编译项目
 3. 按 `F5` 运行程序
 
-**方法三：使用命令行**
-```bash
-# 编译项目
-msbuild AIAnswerTool.sln /p:Configuration=Release
 
-# 运行程序
-cd bin\Release
-AIAnswerTool.exe
-```
 
 ### 配置说明
 
