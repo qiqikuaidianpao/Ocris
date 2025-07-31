@@ -13,11 +13,12 @@
 
 ## 技术栈
 
-- **框架**: .NET Framework 4.7.2
+- **框架**: .NET Framework 4.8
 - **UI**: WPF (Windows Presentation Foundation)
 - **OCR**: PaddleOCR
 - **AI服务**: 阿里云DashScope API
 - **架构模式**: MVVM
+- **目标平台**: x64
 
 ## 项目结构
 
@@ -35,45 +36,114 @@ AIAnswerTool/
 
 ## 快速开始
 
-### 环境要求
+### 系统要求
 
-- Windows 10/11
-- .NET Framework 4.7.2 或更高版本
-- Visual Studio 2019 或更高版本（开发）
+- **操作系统**: Windows 10/11 (x64)
+- **.NET Framework**: 4.8 或更高版本
+- **Visual C++ 运行库**: Microsoft Visual C++ 2015-2022 Redistributable (x64)
+- **内存**: 建议 4GB 以上
+- **磁盘空间**: 至少 500MB 可用空间
 
-### 从GitHub获取项目
+### 一键运行（推荐）
 
-1. 克隆项目到本地
+**克隆并直接运行**
 ```bash
+# 1. 克隆项目
 git clone https://github.com/qiqikuaidianpao/AIAnswerTool.git
 cd AIAnswerTool
-```
 
-### 编译运行
-
-**方法一：使用PowerShell脚本（推荐，自动处理依赖）**
-```powershell
+# 2. 构建项目（自动处理所有依赖）
 .\build.ps1
-```
-> 💡 **提示**：PowerShell脚本会自动处理NuGet包恢复和编译，无需手动操作
-
-**方法二：手动编译（适合高级用户）**
-```bash
-# 1. 恢复NuGet包
-nuget restore
-
-# 2. 编译项目
-msbuild AIAnswerTool.sln /p:Configuration=Release
 
 # 3. 运行程序
-cd bin\Release
-AIAnswerTool.exe
+.\bin\Debug\AIAnswerTool.exe
 ```
 
-**方法三：使用Visual Studio**
-1. 双击 `AIAnswerTool.sln` 打开项目
-2. 按 `Ctrl+Shift+B` 编译项目
-3. 按 `F5` 运行程序
+> ✅ **保证**: 执行以上命令后，程序可直接运行，无需额外配置
+
+### 构建说明
+
+#### 自动构建（推荐）
+
+项目包含自动化构建脚本，会处理所有依赖和配置：
+
+```powershell
+# 在项目根目录执行
+.\build.ps1
+```
+
+**构建脚本功能**：
+- 自动复制所有必需的DLL到lib文件夹
+- 编译项目生成可执行文件
+- 确保所有运行时依赖正确部署
+- 生成完整的可分发版本
+
+#### 手动构建
+
+如果需要手动构建，请按以下步骤：
+
+```bash
+# 1. 确保依赖文件在正确位置
+# 检查 lib/ 文件夹包含所有必需的DLL
+
+# 2. 使用MSBuild编译
+"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\MSBuild.exe" AIAnswerTool.csproj /p:Configuration=Debug /p:Platform=x64
+
+# 3. 验证输出
+# 检查 bin\Debug\ 文件夹包含 AIAnswerTool.exe 和所有DLL
+```
+
+#### Visual Studio 构建
+
+1. 使用 Visual Studio 2019 或更高版本打开 `AIAnswerTool.csproj`
+2. 选择 **Debug** 配置和 **x64** 平台
+3. 按 `Ctrl+Shift+B` 构建项目
+4. 按 `F5` 运行程序
+
+### 项目依赖
+
+项目使用以下核心依赖库：
+
+| 依赖库 | 版本 | 用途 |
+|--------|------|------|
+| PaddleOCRSharp | 最新 | OCR文字识别引擎 |
+| Newtonsoft.Json | 最新 | JSON数据处理 |
+| RestSharp | 最新 | HTTP客户端 |
+| NHotkey.Wpf | 最新 | 全局快捷键支持 |
+| WPFDevelopers | 最新 | WPF UI组件库 |
+| Microsoft.Web.WebView2 | 最新 | 内嵌浏览器控件 |
+| AutoUpdater.NET | 最新 | 自动更新功能 |
+
+**重要说明**：
+- 所有依赖已预配置在项目中
+- 构建脚本会自动处理依赖部署
+- 无需手动下载或安装额外组件
+
+### 输出结构
+
+成功构建后，`bin\Debug\` 目录包含：
+
+```
+bin\Debug\
+├── AIAnswerTool.exe          # 主程序
+├── AIAnswerTool.exe.config    # 配置文件
+├── *.dll                      # 所有依赖库
+├── inference\                 # OCR模型文件
+│   ├── ch_PP-OCRv4_det_infer\
+│   ├── ch_PP-OCRv4_rec_infer\
+│   └── ...
+└── 多语言资源文件夹
+```
+
+### 分发部署
+
+要分发给其他用户：
+
+1. 将整个 `bin\Debug\` 文件夹复制到目标机器
+2. 确保目标机器安装了 .NET Framework 4.8
+3. 直接运行 `AIAnswerTool.exe`
+
+> 📦 **打包提示**: 可以使用 7-Zip 或 WinRAR 将 `bin\Debug\` 文件夹打包为压缩包分发
 
 
 
@@ -85,6 +155,57 @@ AIAnswerTool.exe
 - `AliCloudBaseUrl`: 阿里云服务地址
 - `LogPath`: 日志文件路径
 - `ScreenshotPath`: 截图保存路径
+
+### 故障排除
+
+#### 常见问题
+
+**Q: 编译时提示找不到DLL文件**
+```
+A: 执行 .\build.ps1 脚本，它会自动复制所有必需的DLL到正确位置
+```
+
+**Q: 运行时提示缺少 .NET Framework**
+```
+A: 下载并安装 Microsoft .NET Framework 4.8
+   下载地址: https://dotnet.microsoft.com/download/dotnet-framework/net48
+```
+
+**Q: OCR功能无法使用**
+```
+A: 确保以下文件存在：
+   - PaddleOCR.dll
+   - opencv_world470.dll
+   - paddle_inference.dll
+   - inference/ 文件夹及其模型文件
+```
+
+**Q: 程序启动后立即崩溃**
+```
+A: 检查以下项目：
+   1. 确保所有DLL文件在 bin\Debug\ 目录下
+   2. 检查 App.config 配置文件是否正确
+   3. 查看日志文件获取详细错误信息
+```
+
+**Q: PowerShell脚本执行被阻止**
+```
+A: 以管理员身份运行PowerShell，执行：
+   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
+
+#### 日志文件
+
+程序运行时会生成详细的日志文件，位置：
+- 默认路径: `%TEMP%\AIAnswerTool\logs\`
+- 可通过 App.config 自定义路径
+
+#### 获取帮助
+
+如果遇到其他问题：
+1. 查看日志文件获取详细错误信息
+2. 在 GitHub Issues 中搜索相似问题
+3. 提交新的 Issue 并附上日志文件
 
 ## 使用说明
 
