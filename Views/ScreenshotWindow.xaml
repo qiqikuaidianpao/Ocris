@@ -17,6 +17,105 @@
         MouseMove="Window_MouseMove"
         MouseLeftButtonUp="Window_MouseLeftButtonUp">
     
+    <Window.Resources>
+        <!-- 现代化工具栏按钮样式 -->
+        <Style x:Key="ToolBarButton" TargetType="Button">
+            <Setter Property="Background" Value="#FFFFFF"/>
+            <Setter Property="BorderBrush" Value="#E0E0E0"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="8"/>
+            <Setter Property="Margin" Value="2"/>
+            <Setter Property="Width" Value="40"/>
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Name="border" 
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="6"
+                                Padding="{TemplateBinding Padding}">
+                            <Border.Effect>
+                                <DropShadowEffect Color="Black" 
+                                                  Opacity="0.1" 
+                                                  ShadowDepth="2" 
+                                                  BlurRadius="4"/>
+                            </Border.Effect>
+                            <ContentPresenter HorizontalAlignment="Center" 
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#F5F5F5"/>
+                                <Setter TargetName="border" Property="BorderBrush" Value="#CCCCCC"/>
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="border"
+                                                             Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
+                                                             To="1.05" Duration="0:0:0.1"/>
+                                            <DoubleAnimation Storyboard.TargetName="border"
+                                                             Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
+                                                             To="1.05" Duration="0:0:0.1"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+                                <Trigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="border"
+                                                             Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
+                                                             To="1.0" Duration="0:0:0.1"/>
+                                            <DoubleAnimation Storyboard.TargetName="border"
+                                                             Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
+                                                             To="1.0" Duration="0:0:0.1"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.ExitActions>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#E8E8E8"/>
+                                <Setter TargetName="border" Property="BorderBrush" Value="#AAAAAA"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="RenderTransform">
+                <Setter.Value>
+                    <ScaleTransform ScaleX="1" ScaleY="1"/>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+        </Style>
+        
+        <!-- 工具栏容器样式 -->
+        <Style x:Key="ModernToolBar" TargetType="Border">
+            <Setter Property="Background">
+                <Setter.Value>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                        <GradientStop Color="#FFFFFF" Offset="0"/>
+                        <GradientStop Color="#F8F8F8" Offset="1"/>
+                    </LinearGradientBrush>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="BorderBrush" Value="#E0E0E0"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="8"/>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect Color="Black" 
+                                      Opacity="0.15" 
+                                      ShadowDepth="3" 
+                                      BlurRadius="8"/>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+    
     <Grid Name="MainGrid">
         <!-- 背景遮罩 -->
         <Rectangle Name="BackgroundMask"
@@ -25,12 +124,32 @@
         
         <!-- 选择区域 -->
         <Canvas Name="SelectionCanvas">
+            <!-- 窗口高亮矩形 -->
+            <Rectangle Name="HighlightRectangle"
+                       Stroke="#FF4444"
+                       StrokeThickness="3"
+                       Fill="#22FF4444"
+                       StrokeDashArray="5,3"
+                       Visibility="Collapsed" />
+            
             <!-- 选择矩形 -->
             <Rectangle Name="SelectionRectangle"
                        Stroke="Red"
                        StrokeThickness="2"
                        Fill="Transparent"
                        Visibility="Collapsed" />
+            
+            <!-- 窗口信息提示 -->
+            <Border Name="WindowInfoPanel"
+                    Background="#CC000000"
+                    Padding="8,4"
+                    CornerRadius="3"
+                    Visibility="Collapsed">
+                <TextBlock Name="WindowInfoText"
+                           Foreground="White"
+                           FontSize="11"
+                           FontFamily="Consolas" />
+            </Border>
             
             <!-- 选择区域信息 -->
             <Border Name="InfoPanel"
@@ -42,29 +161,123 @@
                            FontSize="12"
                            FontFamily="Consolas" />
             </Border>
-            <!-- 工具栏 -->
+            <!-- 现代化工具栏 -->
             <Border Name="ToolBar"
-                    Background="#F2F2F2"
-                    CornerRadius="5"
-                    Padding="5"
+                    Style="{StaticResource ModernToolBar}"
                     Visibility="Collapsed">
-                <StackPanel Orientation="Horizontal">
-                    <Button Name="ConfirmButton"
+                <Border.RenderTransform>
+                    <TranslateTransform x:Name="ToolBarTransform" Y="-50"/>
+                </Border.RenderTransform>
+                <Border.Triggers>
+                    <EventTrigger RoutedEvent="Border.Loaded">
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation Storyboard.TargetName="ToolBarTransform"
+                                               Storyboard.TargetProperty="Y"
+                                               From="-50" To="0"
+                                               Duration="0:0:0.3">
+                                    <DoubleAnimation.EasingFunction>
+                                        <QuadraticEase EasingMode="EaseOut"/>
+                                    </DoubleAnimation.EasingFunction>
+                                </DoubleAnimation>
+                                <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                               From="0" To="1"
+                                               Duration="0:0:0.3"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </EventTrigger>
+                </Border.Triggers>
+                <StackPanel Name="ToolBarPanel" Orientation="Horizontal">
+                    <!-- 自由选择按钮 -->
+                    <Button Name="FreeSelectionButton"
                             Style="{StaticResource ToolBarButton}"
-                            Click="ConfirmButton_Click">
-                        <Path Data="M9,16.17L4.83,12l-1.42,1.41L9,19 21,7l-1.41,-1.41L9,16.17z" 
-                              Fill="#4CAF50" 
-                              Width="20" 
-                              Height="20" 
+                            Click="FreeSelectionButton_Click"
+                            ToolTip="自由选择模式">
+                        <Path Data="M3,3H5V5H3V3M7,3H21V5H7V3M3,7H5V9H3V7M7,7H21V9H7V7M3,11H5V13H3V11M7,11H21V13H7V11M3,15H5V17H3V15M7,15H21V17H7V15M3,19H5V21H3V19M7,19H21V21H7V19Z" 
+                              Fill="#2196F3" 
+                              Width="18" 
+                              Height="18" 
                               Stretch="Uniform" />
                     </Button>
+                    
+                    <!-- 分隔线 -->
+                    <Rectangle Width="1" Height="30" Fill="#E0E0E0" Margin="4,0"/>
+                    
+                    <!-- 确认截图按钮 -->
+                    <Button Name="ConfirmButton"
+                            Style="{StaticResource ToolBarButton}"
+                            Click="ConfirmButton_Click"
+                            ToolTip="确认截图 (Enter)">
+                        <Path Data="M9,16.17L4.83,12l-1.42,1.41L9,19 21,7l-1.41,-1.41L9,16.17z" 
+                              Fill="#4CAF50" 
+                              Width="18" 
+                              Height="18" 
+                              Stretch="Uniform" />
+                    </Button>
+                    
+                    <!-- 取消截图按钮 -->
                     <Button Name="CancelButton"
                             Style="{StaticResource ToolBarButton}"
-                            Click="CancelButton_Click">
+                            Click="CancelButton_Click"
+                            ToolTip="取消截图 (Esc)">
                         <Path Data="M19,6.41L17.59,5 12,10.59 6.41,5 5,6.41 10.59,12 5,17.59 6.41,19 12,13.41 17.59,19 19,17.59 13.41,12 19,6.41z" 
                               Fill="#F44336" 
-                              Width="20" 
-                              Height="20" 
+                              Width="18" 
+                              Height="18" 
+                              Stretch="Uniform" />
+                    </Button>
+                    
+                    <!-- 分隔线 -->
+                    <Rectangle Width="1" Height="30" Fill="#E0E0E0" Margin="4,0"/>
+                    
+                    <!-- 智能模式切换按钮 -->
+                    <Button Name="SmartModeButton"
+                            Style="{StaticResource ToolBarButton}"
+                            Click="SmartModeButton_Click"
+                            ToolTip="切换检测模式 (Tab)">
+                        <Path Data="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4M12,6A6,6 0 0,0 6,12A6,6 0 0,0 12,18A6,6 0 0,0 18,12A6,6 0 0,0 12,6M12,8A4,4 0 0,1 16,12A4,4 0 0,1 12,16A4,4 0 0,1 8,12A4,4 0 0,1 12,8Z" 
+                              Fill="#2196F3" 
+                              Width="18" 
+                              Height="18" 
+                              Stretch="Uniform" />
+                    </Button>
+                    
+                    <!-- 全屏截图按钮 -->
+                    <Button Name="FullScreenButton"
+                            Style="{StaticResource ToolBarButton}"
+                            Click="FullScreenButton_Click"
+                            ToolTip="全屏截图">
+                        <Path Data="M5,5H10V7H7V10H5V5M14,5H19V10H17V7H14V5M17,14H19V19H14V17H17V14M10,17V19H5V14H7V17H10Z" 
+                              Fill="#FF9800" 
+                              Width="18" 
+                              Height="18" 
+                              Stretch="Uniform" />
+                    </Button>
+                    
+                    <!-- 延时截图按钮 -->
+                    <Button Name="DelayButton"
+                            Style="{StaticResource ToolBarButton}"
+                            Click="DelayButton_Click"
+                            ToolTip="延时截图 (3秒)">
+                        <Path Data="M12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22C6.47,22 2,17.5 2,12A10,10 0 0,1 12,2M12.5,7V12.25L17,14.92L16.25,16.15L11,13V7H12.5Z" 
+                              Fill="#9C27B0" 
+                              Width="18" 
+                              Height="18" 
+                              Stretch="Uniform" />
+                    </Button>
+                    
+                    <!-- 分隔线 -->
+                    <Rectangle Width="1" Height="30" Fill="#E0E0E0" Margin="4,0"/>
+                    
+                    <!-- 设置按钮 -->
+                    <Button Name="SettingsButton"
+                            Style="{StaticResource ToolBarButton}"
+                            Click="SettingsButton_Click"
+                            ToolTip="截图设置">
+                        <Path Data="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.22,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.22,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.68 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z" 
+                              Fill="#607D8B" 
+                              Width="18" 
+                              Height="18" 
                               Stretch="Uniform" />
                     </Button>
                 </StackPanel>
@@ -78,20 +291,47 @@
                 Background="#CC000000"
                 Padding="15,8">
             <StackPanel>
-                <TextBlock Text="截图选择"
+                <TextBlock Text="截图帮助:"
                            Foreground="White"
                            FontSize="16"
                            FontWeight="Bold"
                            HorizontalAlignment="Center"
                            Margin="0,0,0,5" />
-                <TextBlock Text="拖拽鼠标选择截图区域"
+                <TextBlock Text="• 📐 自由选择: 拖拽选择截图区域"
                            Foreground="#CCFFFFFF"
                            FontSize="12"
-                           HorizontalAlignment="Center" />
-                <TextBlock Text="按 ESC 键取消截图"
+                           HorizontalAlignment="Center"
+                           Margin="0,2" />
+                <TextBlock Text="• 🎯 智能模式: 自动检测窗口和元素"
                            Foreground="#CCFFFFFF"
                            FontSize="12"
-                           HorizontalAlignment="Center" />
+                           HorizontalAlignment="Center"
+                           Margin="0,2" />
+                <TextBlock Text="• 🖥️ 全屏截图: 一键截取整个屏幕"
+                           Foreground="#CCFFFFFF"
+                           FontSize="12"
+                           HorizontalAlignment="Center"
+                           Margin="0,2" />
+                <TextBlock Text="• ⏰ 延时截图: 3秒延时自动截图"
+                           Foreground="#CCFFFFFF"
+                           FontSize="12"
+                           HorizontalAlignment="Center"
+                           Margin="0,2" />
+                <TextBlock Text="• Enter 确认截图 | Esc 取消截图"
+                           Foreground="#CCFFFFFF"
+                           FontSize="12"
+                           HorizontalAlignment="Center"
+                           Margin="0,2" />
+                <TextBlock Text="• 点击工具栏按钮切换截图模式"
+                           Foreground="#CCFFFFFF"
+                           FontSize="12"
+                           HorizontalAlignment="Center"
+                           Margin="0,2" />
+                <TextBlock Text="• ⚙️ 设置: 自定义截图选项"
+                           Foreground="#CCFFFFFF"
+                           FontSize="12"
+                           HorizontalAlignment="Center"
+                           Margin="0,2" />
             </StackPanel>
         </Border>
         

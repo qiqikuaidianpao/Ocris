@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using AIAnswerTool.Services;
+using AIAnswerTool.Models;
 
 namespace AIAnswerTool.ViewModels
 {
@@ -15,6 +16,9 @@ namespace AIAnswerTool.ViewModels
         private bool _isSelecting;
         private string _selectionInfo;
         private bool _showToolbar;
+        private ScreenshotMode _currentMode;
+        private bool _isCountingDown;
+        private int _countdownSeconds;
 
         /// <summary>
         /// 状态文本
@@ -81,6 +85,55 @@ namespace AIAnswerTool.ViewModels
         }
 
         /// <summary>
+        /// 当前截图模式
+        /// </summary>
+        public ScreenshotMode CurrentMode
+        {
+            get { return _currentMode; }
+            set
+            {
+                if (_currentMode != value)
+                {
+                    _currentMode = value;
+                    OnPropertyChanged();
+                    UpdateStatusForMode();
+                }
+            }
+        }
+
+        /// <summary>
+        /// 是否正在倒计时
+        /// </summary>
+        public bool IsCountingDown
+        {
+            get { return _isCountingDown; }
+            set
+            {
+                if (_isCountingDown != value)
+                {
+                    _isCountingDown = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        /// <summary>
+        /// 倒计时秒数
+        /// </summary>
+        public int CountdownSeconds
+        {
+            get { return _countdownSeconds; }
+            set
+            {
+                if (_countdownSeconds != value)
+                {
+                    _countdownSeconds = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        /// <summary>
         /// 保存命令
         /// </summary>
         public ICommand SaveCommand { get; private set; }
@@ -95,8 +148,14 @@ namespace AIAnswerTool.ViewModels
         /// </summary>
         public ICommand CancelCommand { get; private set; }
 
+        /// <summary>
+        /// 切换模式命令
+        /// </summary>
+        public ICommand SwitchModeCommand { get; private set; }
+
         public ScreenshotViewModel()
         {
+            CurrentMode = ScreenshotMode.FreeSelection;
             StatusText = "拖拽鼠标选择截图区域";
             SelectionInfo = "";
             
@@ -104,6 +163,7 @@ namespace AIAnswerTool.ViewModels
             SaveCommand = new RelayCommand(ExecuteSave, CanExecuteSave);
             CopyCommand = new RelayCommand(ExecuteCopy, CanExecuteCopy);
             CancelCommand = new RelayCommand(ExecuteCancel);
+            SwitchModeCommand = new RelayCommand(ExecuteSwitchMode);
         }
 
         /// <summary>
@@ -142,9 +202,61 @@ namespace AIAnswerTool.ViewModels
         public void CancelSelection()
         {
             IsSelecting = false;
-            StatusText = "已取消选择";
+            IsCountingDown = false;
             ShowToolbar = false;
             SelectionInfo = "";
+            UpdateStatusForMode();
+        }
+
+        /// <summary>
+        /// 根据当前模式更新状态文本
+        /// </summary>
+        private void UpdateStatusForMode()
+        {
+            if (IsCountingDown)
+            {
+                StatusText = string.Format("延时截图倒计时: {0} 秒", CountdownSeconds);
+                return;
+            }
+
+            switch (CurrentMode)
+            {
+                case ScreenshotMode.FreeSelection:
+                    StatusText = "拖拽鼠标选择截图区域";
+                    break;
+                case ScreenshotMode.SmartWindow:
+                    StatusText = "单击窗口进行智能截图";
+                    break;
+                case ScreenshotMode.FullScreen:
+                    StatusText = "按确认键截取全屏";
+                    break;
+                case ScreenshotMode.DelayedCapture:
+                    StatusText = "点击确认开始3秒延时截图";
+                    break;
+                default:
+                    StatusText = "选择截图模式";
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// 开始倒计时
+        /// </summary>
+        /// <param name="seconds">倒计时秒数</param>
+        public void StartCountdown(int seconds)
+        {
+            CountdownSeconds = seconds;
+            IsCountingDown = true;
+            UpdateStatusForMode();
+        }
+
+        /// <summary>
+        /// 停止倒计时
+        /// </summary>
+        public void StopCountdown()
+        {
+            IsCountingDown = false;
+            UpdateStatusForMode();
         }
 
         #region 命令实现
@@ -172,6 +284,14 @@ namespace AIAnswerTool.ViewModels
         private void ExecuteCancel(object parameter)
         {
             // 取消逻辑由视图处理
+        }
+
+        private void ExecuteSwitchMode(object parameter)
+        {
+            if (parameter is ScreenshotMode)
+            {
+                CurrentMode = (ScreenshotMode)parameter;
+            }
         }
 
         #endregion

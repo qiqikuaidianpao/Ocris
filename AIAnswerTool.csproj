@@ -38,7 +38,11 @@
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
+    <Reference Include="UIAutomationClient" />
+    <Reference Include="UIAutomationTypes" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -52,6 +56,8 @@
     <Reference Include="PresentationFramework" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="UIAutomationClient" />
+    <Reference Include="UIAutomationTypes" />
     <Reference Include="PaddleOCRSharp">
       <HintPath>lib\PaddleOCRSharp.dll</HintPath>
     </Reference>
@@ -122,6 +128,7 @@
     <Compile Include="Models\ConfigModel.cs" />
     <Compile Include="Models\ChoiceOption.cs" />
     <Compile Include="Models\HotkeyModels.cs" />
+    <Compile Include="Models\ScreenshotMode.cs" />
     <Compile Include="Services\IAIService.cs" />
     <Compile Include="Services\AIService.cs" />
     <Compile Include="Services\IOCRService.cs" />
@@ -136,6 +143,8 @@
     <Compile Include="Services\AliCloudAIService.cs" />
     <Compile Include="Services\HotkeyService.cs" />
     <Compile Include="Services\ImageProcessor.cs" />
+    <Compile Include="Services\IWindowDetectionService.cs" />
+    <Compile Include="Services\WindowDetectionService.cs" />
     <Compile Include="ViewModels\ScreenshotViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\SettingsViewModel.cs" />

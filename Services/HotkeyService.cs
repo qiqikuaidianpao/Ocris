@@ -25,7 +25,7 @@ namespace AIAnswerTool.Services
             if (logService == null) throw new ArgumentNullException("logService");
             _logService = logService;
             _registeredHotkeys = new Dictionary<string, Models.HotkeyInfo>();
-            _logService.LogInfo("HotkeyService initialized");
+            _logService.Info("HotkeyService initialized");
         }
 
         public bool RegisterHotkey(string id, string name, ModifierKeys modifiers, Key key, string description = "")
@@ -38,7 +38,7 @@ namespace AIAnswerTool.Services
         {
             if (hotkey == null || string.IsNullOrWhiteSpace(hotkey.Id))
             {
-                _logService.LogError("Hotkey or Hotkey ID cannot be null or empty");
+                _logService.Error("Hotkey or Hotkey ID cannot be null or empty");
                 return false;
             }
 
@@ -61,7 +61,7 @@ namespace AIAnswerTool.Services
                     if (IsHotkeyAvailable(hotkey.Modifiers, hotkey.Key) == false)
                     {
                         var errorMsg = string.Format("Hotkey conflict detected. '{0}' is already in use.", hotkey.ToString());
-                        _logService.LogError(errorMsg);
+                        _logService.Error(errorMsg);
                         OnHotkeyRegistrationFailed(errorMsg);
                         return false;
                     }
@@ -69,13 +69,13 @@ namespace AIAnswerTool.Services
                     HotkeyManager.Current.AddOrReplace(hotkey.Id, hotkey.Key, hotkey.Modifiers, OnHotkeyPressed);
                     hotkey.IsRegistered = true;
                     _registeredHotkeys[hotkey.Id] = hotkey;
-                    _logService.LogInfo("Successfully registered hotkey: {0} ({1})", hotkey.Id, hotkey.ToString());
+                    _logService.Info("Successfully registered hotkey: {0} ({1})", hotkey.Id, hotkey.ToString());
                     return true;
                 }
                 catch (Exception ex)
                 {
                     var errorMsg = string.Format("Failed to register hotkey '{0}' ({1}): {2}", hotkey.Id, hotkey.ToString(), ex.Message);
-                    _logService.LogError(errorMsg, ex);
+                    _logService.Error(errorMsg, ex);
                     OnHotkeyRegistrationFailed(errorMsg);
                     return false;
                 }
@@ -86,7 +86,7 @@ namespace AIAnswerTool.Services
         {
             if (string.IsNullOrWhiteSpace(id))
             {
-                _logService.LogError("Hotkey ID cannot be null or empty");
+                _logService.Error("Hotkey ID cannot be null or empty");
                 return false;
             }
 
@@ -109,12 +109,12 @@ namespace AIAnswerTool.Services
 
                     HotkeyManager.Current.Remove(id);
                     hotkeyInfo.IsRegistered = false;
-                    _logService.LogInfo("Successfully unregistered hotkey: {0}", id);
+                    _logService.Info("Successfully unregistered hotkey: {0}", id);
                     return true;
                 }
                 catch (Exception ex)
                 {
-                    _logService.LogError("Failed to unregister hotkey '{0}': {1}", id, ex.Message, ex);
+                    _logService.Error("Failed to unregister hotkey '{0}': {1}", id, ex.Message, ex);
                     return false;
                 }
             }
@@ -169,10 +169,10 @@ namespace AIAnswerTool.Services
                 {
                     // 检查是否已注册且服务已启用
                     bool isActive = hotkeyInfo.IsRegistered && _isServiceEnabled;
-                    _logService.LogDebug("Hotkey '{0}' active status: {1}", hotkeyName, isActive);
+                    _logService.Debug("Hotkey '{0}' active status: {1}", hotkeyName, isActive);
                     return isActive;
                 }
-                _logService.LogDebug("Hotkey '{0}' not found in registered hotkeys", hotkeyName);
+                _logService.Debug("Hotkey '{0}' not found in registered hotkeys", hotkeyName);
                 return false;
             }
         }
@@ -225,12 +225,12 @@ namespace AIAnswerTool.Services
             {
                 if (_isServiceEnabled)
                 {
-                    _logService.LogInfo("HotkeyService is already enabled");
+                    _logService.Info("HotkeyService is already enabled");
                     return;
                 }
 
                 _isServiceEnabled = true;
-                _logService.LogInfo("HotkeyService enabled");
+                _logService.Info("HotkeyService enabled");
 
                 var hotkeysToReregister = _registeredHotkeys.Values.Where(h => !h.IsRegistered).ToList();
                 foreach (var hotkeyInfo in hotkeysToReregister)
@@ -246,13 +246,13 @@ namespace AIAnswerTool.Services
             {
                 if (!_isServiceEnabled)
                 {
-                    _logService.LogInfo("HotkeyService is already disabled");
+                    _logService.Info("HotkeyService is already disabled");
                     return;
                 }
 
                 UnregisterAllHotkeys();
                 _isServiceEnabled = false;
-                _logService.LogInfo("HotkeyService disabled");
+                _logService.Info("HotkeyService disabled");
             }
         }
 
@@ -274,7 +274,7 @@ namespace AIAnswerTool.Services
                 Models.HotkeyInfo hotkeyInfo;
                 if (_registeredHotkeys.TryGetValue(e.Name, out hotkeyInfo))
                 {
-                    _logService.LogInfo("Hotkey pressed: {0} ({1})", e.Name, hotkeyInfo.HotkeyString);
+                    _logService.Info("Hotkey pressed: {0} ({1})", e.Name, hotkeyInfo.HotkeyString);
                     
                     // 记录触发信息
                     hotkeyInfo.RecordTrigger();
@@ -285,7 +285,7 @@ namespace AIAnswerTool.Services
                         {
                             var eventArgs = new Models.HotkeyEventArgs(hotkeyInfo);
                             HotkeyPressed(this, eventArgs);
-                            _logService.LogDebug("Hotkey event '{0}' handled successfully", e.Name);
+                            _logService.Debug("Hotkey event '{0}' handled successfully", e.Name);
                         }
                         else
                         {
@@ -294,7 +294,7 @@ namespace AIAnswerTool.Services
                     }
                     catch (Exception ex)
                     {
-                        _logService.LogError("Error handling hotkey event '{0}': {1}", e.Name, ex.Message, ex);
+                        _logService.Error("Error handling hotkey event '{0}': {1}", e.Name, ex.Message, ex);
                     }
                 }
                 else
@@ -329,7 +329,7 @@ namespace AIAnswerTool.Services
                 {
                     _registeredHotkeys.Clear();
                 }
-                _logService.LogInfo("HotkeyService disposed");
+                _logService.Info("HotkeyService disposed");
             }
 
             _disposed = true;

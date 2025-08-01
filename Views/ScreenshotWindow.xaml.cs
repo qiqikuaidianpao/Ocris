@@ -7,12 +7,28 @@ using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Controls;
 using System.Windows.Interop;
+using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
+using System.Windows.Shapes;
+using System.Windows.Threading;
+using System.Threading;
 using AIAnswerTool.Services;
 using AIAnswerTool.ViewModels;
+using AIAnswerTool.Views;
+using AIAnswerTool.Models;
 
 namespace AIAnswerTool.Views
 {
+    /// <summary>
+    /// 检测模式枚举
+    /// </summary>
+    public enum DetectionMode
+    {
+        Window,    // 窗口模式
+        Element    // 控件模式
+    }
+
     /// <summary>
     /// 截图选择窗口
     /// </summary>
@@ -23,6 +39,18 @@ namespace AIAnswerTool.Views
         private System.Windows.Point _endPoint;
         private Bitmap _backgroundImage;
         private ScreenshotViewModel _viewModel;
+        
+        // 窗口检测相关字段
+        private readonly IWindowDetectionService _windowDetectionService;
+        private DetectionMode _currentDetectionMode = DetectionMode.Window;
+        private System.Threading.Timer _detectionTimer;
+        private System.Windows.Point _lastMousePosition;
+        private IntPtr _lastHighlightedWindow = IntPtr.Zero;
+        private bool _isHighlightingEnabled = true;
+        
+        // 延时截图相关字段
+        private DispatcherTimer _countdownTimer;
+        private int _countdownSeconds = 3;
 
         /// <summary>
         /// 截图完成事件
@@ -34,16 +62,25 @@ namespace AIAnswerTool.Views
         /// </summary>
         public event EventHandler ScreenshotCancelled;
 
-        public ScreenshotWindow(Rectangle bounds)
+        public ScreenshotWindow(System.Drawing.Rectangle bounds) : this(bounds, null)
+        {
+        }
+        
+        public ScreenshotWindow(System.Drawing.Rectangle bounds, IWindowDetectionService windowDetectionService)
         {
             InitializeComponent();
+            _windowDetectionService = windowDetectionService;
             InitializeWindow(bounds);
+            if (_windowDetectionService != null)
+            {
+                InitializeWindowDetection();
+            }
         }
 
         /// <summary>
         /// 初始化窗口
         /// </summary>
-        private void InitializeWindow(Rectangle bounds)
+        private void InitializeWindow(System.Drawing.Rectangle bounds)
         {
             try
             {
@@ -84,6 +121,9 @@ namespace AIAnswerTool.Views
                 _viewModel = new ScreenshotViewModel();
                 DataContext = _viewModel;
                 
+                // 订阅模式变化事件
+                _viewModel.PropertyChanged += ViewModel_PropertyChanged;
+                
                 // 设置焦点以接收键盘事件
                 Focusable = true;
                 Focus();
@@ -95,7 +135,158 @@ namespace AIAnswerTool.Views
             }
         }
 
+        /// <summary>
+        /// 初始化窗口检测功能
+        /// </summary>
+        private void InitializeWindowDetection()
+        {
+            if (_windowDetectionService != null)
+            {
+                // 创建检测定时器，每100ms检测一次
+                _detectionTimer = new System.Threading.Timer(DetectWindowUnderMouse, null, Timeout.Infinite, 100);
+            }
+        }
 
+        /// <summary>
+        /// 检测鼠标下的窗口
+        /// </summary>
+        private void DetectWindowUnderMouse(object state)
+        {
+            if (!_isHighlightingEnabled || _isSelecting || _windowDetectionService == null)
+                return;
+
+            try
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    var mousePos = Mouse.GetPosition(this);
+                    
+                    // 避免过于频繁的检测
+                    if (Math.Abs(mousePos.X - _lastMousePosition.X) < 5 && 
+                        Math.Abs(mousePos.Y - _lastMousePosition.Y) < 5)
+                        return;
+                    
+                    _lastMousePosition = mousePos;
+                    
+                    // 转换为屏幕坐标
+                    var screenPoint = PointToScreen(mousePos);
+                    var screenPos = new System.Drawing.Point((int)screenPoint.X, (int)screenPoint.Y);
+                    
+                    if (_currentDetectionMode == DetectionMode.Window)
+                    {
+                        DetectWindow(screenPos);
+                    }
+                    else
+                    {
+                        DetectElement(screenPos);
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(string.Format("窗口检测错误: {0}", ex.Message));
+            }
+        }
+
+        /// <summary>
+        /// 检测窗口模式
+        /// </summary>
+        private void DetectWindow(System.Drawing.Point screenPos)
+        {
+            var windowHandle = _windowDetectionService.GetWindowUnderCursor();
+            
+            if (windowHandle != _lastHighlightedWindow)
+            {
+                _lastHighlightedWindow = windowHandle;
+                
+                if (windowHandle != IntPtr.Zero && _windowDetectionService.IsValidWindow(windowHandle))
+                {
+                    var bounds = _windowDetectionService.GetWindowBounds(windowHandle);
+                    var windowInfo = _windowDetectionService.GetWindowInfo(windowHandle);
+                    
+                    UpdateHighlight(bounds, string.Format("窗口: {0}\n类名: {1}\n进程: {2}", windowInfo.Title, windowInfo.ClassName, windowInfo.ProcessName));
+                }
+                else
+                {
+                    HideHighlight();
+                }
+            }
+        }
+
+        /// <summary>
+        /// 检测控件模式
+        /// </summary>
+        private void DetectElement(System.Drawing.Point screenPos)
+        {
+            try
+            {
+                var element = _windowDetectionService.GetElementUnderPoint(screenPos);
+                
+                if (element != null)
+                {
+                    var bounds = _windowDetectionService.GetElementBounds(element);
+                    var elementInfo = _windowDetectionService.GetElementInfo(element);
+                    
+                    UpdateHighlight(bounds, string.Format("控件: {0}\n类型: {1}\n自动化ID: {2}", elementInfo.Name, elementInfo.ControlType, elementInfo.AutomationId));
+                }
+                else
+                {
+                    HideHighlight();
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(string.Format("控件检测错误: {0}", ex.Message));
+                HideHighlight();
+            }
+        }
+
+        /// <summary>
+        /// 更新高亮显示
+        /// </summary>
+        private void UpdateHighlight(System.Drawing.Rectangle bounds, string info)
+        {
+            try
+            {
+                // 转换为窗口坐标
+                var virtualScreen = SystemInformation.VirtualScreen;
+                var windowX = bounds.X - virtualScreen.X;
+                var windowY = bounds.Y - virtualScreen.Y;
+                
+                // 更新高亮矩形
+                Canvas.SetLeft(HighlightRectangle, windowX);
+                Canvas.SetTop(HighlightRectangle, windowY);
+                HighlightRectangle.Width = bounds.Width;
+                HighlightRectangle.Height = bounds.Height;
+                HighlightRectangle.Visibility = Visibility.Visible;
+                
+                // 更新信息提示
+                WindowInfoText.Text = info;
+                Canvas.SetLeft(WindowInfoPanel, windowX + 5);
+                Canvas.SetTop(WindowInfoPanel, windowY - 60);
+                
+                // 确保信息面板在屏幕内
+                if (Canvas.GetTop(WindowInfoPanel) < 0)
+                {
+                    Canvas.SetTop(WindowInfoPanel, windowY + 5);
+                }
+                
+                WindowInfoPanel.Visibility = Visibility.Visible;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(string.Format("更新高亮显示错误: {0}", ex.Message));
+            }
+        }
+
+        /// <summary>
+        /// 隐藏高亮显示
+        /// </summary>
+        private void HideHighlight()
+        {
+            HighlightRectangle.Visibility = Visibility.Collapsed;
+            WindowInfoPanel.Visibility = Visibility.Collapsed;
+        }
 
         /// <summary>
         /// 捕获背景图像
@@ -108,7 +299,7 @@ namespace AIAnswerTool.Views
                 var virtualScreen = SystemInformation.VirtualScreen;
                 System.Diagnostics.Debug.WriteLine(string.Format("捕获背景图像: 虚拟屏幕 X={0}, Y={1}, W={2}, H={3}", virtualScreen.X, virtualScreen.Y, virtualScreen.Width, virtualScreen.Height));
                 
-                _backgroundImage = new Bitmap(virtualScreen.Width, virtualScreen.Height, PixelFormat.Format32bppArgb);
+                _backgroundImage = new Bitmap(virtualScreen.Width, virtualScreen.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
                 
                 using (var graphics = Graphics.FromImage(_backgroundImage))
                 {
@@ -133,12 +324,48 @@ namespace AIAnswerTool.Views
             {
                 CancelScreenshot();
             }
+            else if (e.Key == Key.Tab)
+            {
+                // 切换检测模式
+                _currentDetectionMode = _currentDetectionMode == DetectionMode.Window 
+                    ? DetectionMode.Element 
+                    : DetectionMode.Window;
+                
+                // 清除当前高亮
+                HideHighlight();
+                _lastHighlightedWindow = IntPtr.Zero;
+                
+                System.Diagnostics.Debug.WriteLine(string.Format("切换到{0}检测模式", _currentDetectionMode == DetectionMode.Window ? "窗口" : "控件"));
+                e.Handled = true;
+            }
         }
 
         /// <summary>
         /// 鼠标左键按下事件
         /// </summary>
         private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            switch (_viewModel.CurrentMode)
+            {
+                case ScreenshotMode.FreeSelection:
+                    HandleFreeSelectionMouseDown(e);
+                    break;
+                case ScreenshotMode.SmartWindow:
+                    HandleSmartWindowMouseDown(e);
+                    break;
+                case ScreenshotMode.FullScreen:
+                    HandleFullScreenCapture();
+                    break;
+                case ScreenshotMode.DelayedCapture:
+                    HandleDelayedCapture();
+                    break;
+            }
+        }
+        
+        /// <summary>
+        /// 处理自由选择模式的鼠标按下
+        /// </summary>
+        private void HandleFreeSelectionMouseDown(MouseButtonEventArgs e)
         {
             _isSelecting = true;
             _startPoint = e.GetPosition(this);
@@ -150,16 +377,76 @@ namespace AIAnswerTool.Views
             CaptureMouse();
             UpdateSelection();
         }
+        
+        /// <summary>
+        /// 处理智能窗口模式的鼠标按下
+        /// </summary>
+        private void HandleSmartWindowMouseDown(MouseButtonEventArgs e)
+        {
+            if (_windowDetectionService != null && HighlightRectangle.Visibility == Visibility.Visible)
+            {
+                // 使用当前高亮的窗口区域作为选择区域
+                var highlightLeft = Canvas.GetLeft(HighlightRectangle);
+                var highlightTop = Canvas.GetTop(HighlightRectangle);
+                
+                _startPoint = new System.Windows.Point(highlightLeft, highlightTop);
+                _endPoint = new System.Windows.Point(highlightLeft + HighlightRectangle.Width, highlightTop + HighlightRectangle.Height);
+                
+                // 隐藏高亮，显示选择
+                HideHighlight();
+                SelectionRectangle.Visibility = Visibility.Visible;
+                InfoPanel.Visibility = Visibility.Visible;
+                
+                UpdateSelection();
+                ShowToolBar();
+            }
+        }
+        
+        /// <summary>
+        /// 处理全屏截图
+        /// </summary>
+        private void HandleFullScreenCapture()
+        {
+            var virtualScreen = SystemInformation.VirtualScreen;
+            _startPoint = new System.Windows.Point(0, 0);
+            _endPoint = new System.Windows.Point(virtualScreen.Width, virtualScreen.Height);
+            
+            SelectionRectangle.Visibility = Visibility.Visible;
+            InfoPanel.Visibility = Visibility.Visible;
+            
+            UpdateSelection();
+            ShowToolBar();
+        }
+        
+        /// <summary>
+        /// 处理延时截图
+        /// </summary>
+        private void HandleDelayedCapture()
+        {
+            StartCountdown();
+        }
 
         /// <summary>
         /// 鼠标移动事件
         /// </summary>
         private void Window_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
         {
-            if (_isSelecting)
+            if (_isSelecting && _viewModel.CurrentMode == ScreenshotMode.FreeSelection)
             {
                 _endPoint = e.GetPosition(this);
                 UpdateSelection();
+            }
+            else if (_isHighlightingEnabled && !_isSelecting && _viewModel.CurrentMode == ScreenshotMode.SmartWindow)
+            {
+                // 更新鼠标位置用于窗口检测
+                var currentPosition = e.GetPosition(this);
+                _lastMousePosition = new System.Windows.Point(currentPosition.X, currentPosition.Y);
+                
+                // 启动检测定时器
+                if (_detectionTimer != null)
+                {
+                    _detectionTimer.Change(50, Timeout.Infinite);
+                }
             }
         }
 
@@ -168,7 +455,7 @@ namespace AIAnswerTool.Views
         /// </summary>
         private void Window_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            if (_isSelecting)
+            if (_isSelecting && _viewModel.CurrentMode == ScreenshotMode.FreeSelection)
             {
                 _isSelecting = false;
                 ReleaseMouseCapture();
@@ -177,7 +464,7 @@ namespace AIAnswerTool.Views
                 if (selectionRect.Width > 10 && selectionRect.Height > 10)
                 {
                     // 显示工具栏
-                    ToolBar.Visibility = Visibility.Visible;
+                    ShowToolBar();
                 }
                 else
                 {
@@ -213,6 +500,35 @@ namespace AIAnswerTool.Views
             // 更新工具栏位置
             Canvas.SetLeft(ToolBar, rect.Right - ToolBar.ActualWidth);
             Canvas.SetTop(ToolBar, rect.Bottom + 5);
+        }
+
+        /// <summary>
+        /// 显示工具栏
+        /// </summary>
+        private void ShowToolBar()
+        {
+            var rect = GetSelectionRectangle();
+            if (rect.Width > 0 && rect.Height > 0)
+            {
+                ToolBar.Visibility = Visibility.Visible;
+                
+                // 计算工具栏位置
+                var toolBarX = rect.X + rect.Width - ToolBar.ActualWidth - 10;
+                var toolBarY = rect.Y + rect.Height + 10;
+                
+                // 确保工具栏不超出屏幕边界
+                if (toolBarX < 0) toolBarX = 10;
+                if (toolBarY + ToolBar.ActualHeight > ActualHeight) 
+                    toolBarY = rect.Y - ToolBar.ActualHeight - 10;
+                
+                Canvas.SetLeft(ToolBar, toolBarX);
+                Canvas.SetTop(ToolBar, toolBarY);
+                
+                // 触发动画效果
+                ToolBar.Opacity = 0;
+                var fadeInAnimation = new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(300));
+                ToolBar.BeginAnimation(UIElement.OpacityProperty, fadeInAnimation);
+            }
         }
 
         /// <summary>
@@ -259,7 +575,231 @@ namespace AIAnswerTool.Views
         /// </summary>
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            CancelScreenshot();
+            Close();
+        }
+
+        private void SmartModeButton_Click(object sender, RoutedEventArgs e)
+        {
+            // 切换到智能窗口模式
+            _viewModel.CurrentMode = ScreenshotMode.SmartWindow;
+            
+            // 更新按钮图标颜色以反映当前模式
+            var button = sender as System.Windows.Controls.Button;
+            if (button != null)
+            {
+                var path = button.Content as System.Windows.Shapes.Path;
+                if (path != null)
+                {
+                    path.Fill = new SolidColorBrush(Colors.Orange);
+                }
+            }
+            
+            // 重置其他按钮颜色
+            ResetButtonColors(button);
+        }
+
+        private void FullScreenButton_Click(object sender, RoutedEventArgs e)
+        {
+            // 切换到全屏截图模式
+            _viewModel.CurrentMode = ScreenshotMode.FullScreen;
+            
+            // 更新按钮图标颜色
+            var button = sender as System.Windows.Controls.Button;
+            if (button != null)
+            {
+                var path = button.Content as System.Windows.Shapes.Path;
+                if (path != null)
+                {
+                    path.Fill = new SolidColorBrush(Colors.Green);
+                }
+            }
+            
+            // 重置其他按钮颜色
+            ResetButtonColors(button);
+            
+            // 立即执行全屏截图
+            HandleFullScreenCapture();
+        }
+
+        private void DelayButton_Click(object sender, RoutedEventArgs e)
+        {
+            // 切换到延时截图模式
+            _viewModel.CurrentMode = ScreenshotMode.DelayedCapture;
+            
+            // 更新按钮图标颜色
+            var button = sender as System.Windows.Controls.Button;
+            if (button != null)
+            {
+                var path = button.Content as System.Windows.Shapes.Path;
+                if (path != null)
+                {
+                    path.Fill = new SolidColorBrush(Colors.Red);
+                }
+            }
+            
+            // 重置其他按钮颜色
+            ResetButtonColors(button);
+            
+            // 开始延时截图
+            HandleDelayedCapture();
+        }
+
+        private void SettingsButton_Click(object sender, RoutedEventArgs e)
+        {
+            // 打开设置窗口
+            try
+            {
+                var settingsWindow = new SettingsWindow();
+                settingsWindow.ShowDialog();
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show(string.Format("无法打开设置窗口: {0}", ex.Message), "错误", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+        
+        /// <summary>
+        /// 自由选择模式按钮点击事件
+        /// </summary>
+        private void FreeSelectionButton_Click(object sender, RoutedEventArgs e)
+        {
+            // 切换到自由选择模式
+            _viewModel.CurrentMode = ScreenshotMode.FreeSelection;
+            
+            // 更新按钮图标颜色
+            var button = sender as System.Windows.Controls.Button;
+            if (button != null)
+            {
+                var path = button.Content as System.Windows.Shapes.Path;
+                if (path != null)
+                {
+                    path.Fill = new SolidColorBrush(Colors.Blue);
+                }
+            }
+            
+            // 重置其他按钮颜色
+            ResetButtonColors(button);
+        }
+        
+        /// <summary>
+        /// 重置其他按钮颜色
+        /// </summary>
+        private void ResetButtonColors(System.Windows.Controls.Button activeButton)
+        {
+            // 获取工具栏中的所有按钮
+            var toolbar = FindName("ToolBarPanel") as StackPanel;
+            if (toolbar != null)
+            {
+                foreach (var child in toolbar.Children)
+                {
+                    var button = child as System.Windows.Controls.Button;
+                    if (button != null && button != activeButton)
+                    {
+                        var path = button.Content as System.Windows.Shapes.Path;
+                        if (path != null)
+                        {
+                            // 设置为默认颜色（白色）
+                            path.Fill = new SolidColorBrush(Colors.White);
+                        }
+                    }
+                }
+            }
+        }
+        
+        /// <summary>
+        /// 视图模型属性变化事件处理
+        /// </summary>
+        private void ViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "CurrentMode")
+            {
+                HandleModeChanged();
+            }
+        }
+        
+        /// <summary>
+        /// 处理模式变化
+        /// </summary>
+        private void HandleModeChanged()
+        {
+            // 停止当前操作
+            StopCountdown();
+            CancelSelection();
+            
+            // 根据新模式调整UI状态
+            switch (_viewModel.CurrentMode)
+            {
+                case ScreenshotMode.FreeSelection:
+                    _isHighlightingEnabled = false;
+                    HideHighlight();
+                    break;
+                case ScreenshotMode.SmartWindow:
+                    _isHighlightingEnabled = true;
+                    break;
+                case ScreenshotMode.FullScreen:
+                case ScreenshotMode.DelayedCapture:
+                    _isHighlightingEnabled = false;
+                    HideHighlight();
+                    break;
+            }
+        }
+        
+        /// <summary>
+        /// 开始倒计时
+        /// </summary>
+        private void StartCountdown()
+        {
+            _countdownSeconds = 3;
+            _viewModel.StartCountdown(_countdownSeconds);
+            
+            _countdownTimer = new DispatcherTimer();
+            _countdownTimer.Interval = TimeSpan.FromSeconds(1);
+            _countdownTimer.Tick += CountdownTimer_Tick;
+            _countdownTimer.Start();
+        }
+        
+        /// <summary>
+        /// 倒计时定时器事件
+        /// </summary>
+        private void CountdownTimer_Tick(object sender, EventArgs e)
+        {
+            _countdownSeconds--;
+            _viewModel.CountdownSeconds = _countdownSeconds;
+            
+            if (_countdownSeconds <= 0)
+            {
+                StopCountdown();
+                // 执行全屏截图
+                HandleFullScreenCapture();
+            }
+        }
+        
+        /// <summary>
+        /// 停止倒计时
+        /// </summary>
+        private void StopCountdown()
+        {
+            if (_countdownTimer != null)
+            {
+                _countdownTimer.Stop();
+                _countdownTimer = null;
+            }
+            _viewModel.StopCountdown();
+        }
+        
+        /// <summary>
+        /// 取消选择
+        /// </summary>
+        private void CancelSelection()
+        {
+            _isSelecting = false;
+            ReleaseMouseCapture();
+            
+            SelectionRectangle.Visibility = Visibility.Collapsed;
+            InfoPanel.Visibility = Visibility.Collapsed;
+            ToolBar.Visibility = Visibility.Collapsed;
+            
+            _viewModel.CancelSelection();
         }
 
         /// <summary>
@@ -291,7 +831,7 @@ namespace AIAnswerTool.Views
                 var relativeY = (int)selectionRect.Y;
                 
                 // 计算实际的屏幕坐标（用于返回结果）
-                var screenRect = new Rectangle(
+                var screenRect = new System.Drawing.Rectangle(
                     virtualScreen.X + relativeX,
                     virtualScreen.Y + relativeY,
                     (int)selectionRect.Width,
@@ -304,12 +844,12 @@ namespace AIAnswerTool.Views
                 var cropHeight = Math.Min((int)selectionRect.Height, _backgroundImage.Height - relativeY);
                 
                 // 从背景图像中裁剪选中区域
-                var croppedImage = new Bitmap(cropWidth, cropHeight, PixelFormat.Format32bppArgb);
+                var croppedImage = new Bitmap(cropWidth, cropHeight, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
                 
                 using (var graphics = Graphics.FromImage(croppedImage))
                 {
-                    var sourceRect = new Rectangle(relativeX, relativeY, cropWidth, cropHeight);
-                    graphics.DrawImage(_backgroundImage, new Rectangle(0, 0, cropWidth, cropHeight), sourceRect, GraphicsUnit.Pixel);
+                    var sourceRect = new System.Drawing.Rectangle(relativeX, relativeY, cropWidth, cropHeight);
+                    graphics.DrawImage(_backgroundImage, new System.Drawing.Rectangle(0, 0, cropWidth, cropHeight), sourceRect, GraphicsUnit.Pixel);
                 }
                 
                 return new ScreenshotResult
@@ -337,7 +877,7 @@ namespace AIAnswerTool.Views
         /// <returns>图像格式</returns>
         private ImageFormat GetImageFormat(string fileName)
         {
-            var extension = Path.GetExtension(fileName).ToLower();
+            var extension = System.IO.Path.GetExtension(fileName).ToLower();
             switch (extension)
             {
                 case ".jpg":
@@ -387,6 +927,14 @@ namespace AIAnswerTool.Views
         /// </summary>
         protected override void OnClosed(EventArgs e)
         {
+            // 清理检测定时器
+            if (_detectionTimer != null)
+            {
+                _detectionTimer.Dispose();
+                _detectionTimer = null;
+            }
+            
+            // 清理背景位图
             if (_backgroundImage != null)
             {
                 _backgroundImage.Dispose();

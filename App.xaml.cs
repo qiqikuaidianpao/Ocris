@@ -54,6 +54,7 @@ namespace AIAnswerTool
                     logService.SetLogDirectory(logPath);
                 }
                 
+                var windowDetectionService = new WindowDetectionService(logService);
                 var screenshotService = new ScreenshotService(logService, configService);
                 var ocrService = new OCRService(logService, configService);
                 var aiService = new AliCloudAIService(logService, configService);

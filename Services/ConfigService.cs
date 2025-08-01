@@ -184,7 +184,7 @@ namespace AIAnswerTool.Services
                             if (config != null)
                             {
                                 _currentConfig = config;
-                                _logService.LogInfo("配置文件加载成功: {0}", _configFilePath);
+                                _logService.Info("配置文件加载成功: {0}", _configFilePath);
                             }
                             else
                             {
@@ -202,7 +202,7 @@ namespace AIAnswerTool.Services
                     }
                     else
                     {
-                        _logService.LogInfo("配置文件不存在，创建默认配置");
+                        _logService.Info("配置文件不存在，创建默认配置");
                         _currentConfig = ConfigModel.GetDefault();
                         Task.Run(async () => await CreateDefaultConfigAsync());
                     }
@@ -210,7 +210,7 @@ namespace AIAnswerTool.Services
             }
             catch (Exception ex)
             {
-                _logService.LogError(ex, "加载配置文件失败: {0}", ex.Message);
+                _logService.Error(ex, "加载配置文件失败: {0}", ex.Message);
                 _currentConfig = ConfigModel.GetDefault();
                 Task.Run(async () => await CreateDefaultConfigAsync());
             }
@@ -239,12 +239,12 @@ namespace AIAnswerTool.Services
                     // 重新启用文件监视器
                     _fileWatcher.EnableRaisingEvents = true;
                     
-                    _logService.LogInfo("配置文件保存成功: {0}", _configFilePath);
+                    _logService.Info("配置文件保存成功: {0}", _configFilePath);
                 }
             }
             catch (Exception ex)
             {
-                _logService.LogError(ex, "保存配置文件失败: {0}", ex.Message);
+                _logService.Error(ex, "保存配置文件失败: {0}", ex.Message);
                 throw;
             }
         }
@@ -255,12 +255,12 @@ namespace AIAnswerTool.Services
             {
                 _currentConfig = ConfigModel.GetDefault();
                 await SaveConfigAsync();
-                _logService.LogInfo("配置已重置为默认值");
+                _logService.Info("配置已重置为默认值");
                 OnConfigChanged("Reset", null);
             }
             catch (Exception ex)
             {
-                _logService.LogError(ex, "重置配置失败: {0}", ex.Message);
+                _logService.Error(ex, "重置配置失败: {0}", ex.Message);
                 throw;
             }
         }
@@ -271,12 +271,12 @@ namespace AIAnswerTool.Services
             {
                 _currentConfig = ConfigModel.GetDefault();
                 Task.Run(async () => await SaveConfigAsync());
-                _logService.LogInfo("配置已重置为默认值");
+                _logService.Info("配置已重置为默认值");
                 OnConfigChanged("Reset", null);
             }
             catch (Exception ex)
             {
-                _logService.LogError(ex, "重置配置失败: {0}", ex.Message);
+                _logService.Error(ex, "重置配置失败: {0}", ex.Message);
                 throw;
             }
         }
@@ -294,7 +294,7 @@ namespace AIAnswerTool.Services
             }
             catch (Exception ex)
             {
-                _logService.LogError(ex, "配置验证失败: {0}", ex.Message);
+                _logService.Error(ex, "配置验证失败: {0}", ex.Message);
                 return false;
             }
         }
@@ -316,7 +316,7 @@ namespace AIAnswerTool.Services
             }
             catch (Exception ex)
             {
-                _logService.LogError(ex, "获取配置值失败 [{0}]: {1}", key, ex.Message);
+                _logService.Error(ex, "获取配置值失败 [{0}]: {1}", key, ex.Message);
                 return defaultValue;
             }
         }
@@ -338,7 +338,7 @@ namespace AIAnswerTool.Services
             }
             catch (Exception ex)
             {
-                _logService.LogError(ex, "设置配置值失败 [{0}]: {1}", key, ex.Message);
+                _logService.Error(ex, "设置配置值失败 [{0}]: {1}", key, ex.Message);
             }
         }
 
@@ -381,13 +381,13 @@ namespace AIAnswerTool.Services
                     }
                     catch (Exception ex)
                     {
-                        _logService.LogError(ex, "文件监视器处理失败: {0}", ex.Message);
+                        _logService.Error(ex, "文件监视器处理失败: {0}", ex.Message);
                     }
                 };
             }
             catch (Exception ex)
             {
-                _logService.LogError(ex, "初始化文件监视器失败: {0}", ex.Message);
+                _logService.Error(ex, "初始化文件监视器失败: {0}", ex.Message);
             }
         }
 
@@ -420,7 +420,7 @@ namespace AIAnswerTool.Services
             }
             catch (Exception ex)
             {
-                _logService.LogError(ex, "配置变更事件处理失败: {0}", ex.Message);
+                _logService.Error(ex, "配置变更事件处理失败: {0}", ex.Message);
             }
         }
 
