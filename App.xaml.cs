@@ -57,12 +57,13 @@ namespace AIAnswerTool
                 var screenshotService = new ScreenshotService(logService, configService);
                 var ocrService = new OCRService(logService, configService);
                 var aiService = new AliCloudAIService(logService, configService);
+                var hotkeyService = new HotkeyService(logService);
                 
                 // 确保AI服务重新加载配置
                 aiService.LoadConfiguration();
 
                 // 创建 ViewModel
-                var mainViewModel = new MainViewModel(aiService, logService, screenshotService, ocrService);
+                var mainViewModel = new MainViewModel(aiService, logService, screenshotService, ocrService, hotkeyService);
 
                 // 创建并显示主窗口
                 var mainWindow = new MainWindow();

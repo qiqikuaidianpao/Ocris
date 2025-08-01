@@ -101,6 +101,64 @@ namespace AIAnswerTool.Utils
         };
 
         /// <summary>
-        /// 解析热键字符串
+        /// 尝试解析热键字符串
         /// </summary>
-        /// <param name=
+        /// <param name="configString">热键配置字符串</param>
+        /// <param name="modifiers">解析出的修饰键</param>
+        /// <param name="key">解析出的按键</param>
+        /// <returns>解析是否成功</returns>
+        public static bool TryParse(string configString, out ModifierKeys modifiers, out Key key)
+        {
+            modifiers = ModifierKeys.None;
+            key = Key.None;
+            
+            if (string.IsNullOrEmpty(configString))
+                return false;
+                
+            try
+            {
+                var parts = configString.Split('+');
+                if (parts.Length == 0)
+                    return false;
+                    
+                // 最后一个部分是按键，前面的都是修饰键
+                var keyPart = parts[parts.Length - 1].Trim();
+                
+                // 解析修饰键
+                for (int i = 0; i < parts.Length - 1; i++)
+                {
+                    var modifierPart = parts[i].Trim();
+                    if (ModifierMap.ContainsKey(modifierPart))
+                    {
+                        modifiers |= ModifierMap[modifierPart];
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                
+                // 解析按键
+                if (KeyAliasMap.ContainsKey(keyPart))
+                {
+                    key = KeyAliasMap[keyPart];
+                    return true;
+                }
+                
+                // 尝试直接解析为Key枚举
+                Key parsedKey;
+                if (Enum.TryParse(keyPart, true, out parsedKey))
+                {
+                    key = parsedKey;
+                    return true;
+                }
+                
+                return false;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+    }
+}

@@ -12,36 +12,29 @@ namespace AIAnswerTool.Services
     public class HotkeyService : IHotkeyService, IDisposable
     {
         private readonly ILogService _logService;
-        private readonly Dictionary<string, HotkeyInfo> _registeredHotkeys;
+        private readonly Dictionary<string, Models.HotkeyInfo> _registeredHotkeys;
         private readonly object _lockObject = new object();
         private bool _isServiceEnabled = true;
         private bool _disposed = false;
 
-        public event EventHandler<HotkeyEventArgs> HotkeyPressed;
+        public event EventHandler<Models.HotkeyEventArgs> HotkeyPressed;
         public event EventHandler<string> HotkeyRegistrationFailed;
 
         public HotkeyService(ILogService logService)
         {
             if (logService == null) throw new ArgumentNullException("logService");
             _logService = logService;
-            _registeredHotkeys = new Dictionary<string, HotkeyInfo>();
+            _registeredHotkeys = new Dictionary<string, Models.HotkeyInfo>();
             _logService.LogInfo("HotkeyService initialized");
         }
 
         public bool RegisterHotkey(string id, string name, ModifierKeys modifiers, Key key, string description = "")
         {
-            var hotkeyInfo = new HotkeyInfo
-            {
-                Id = id,
-                Name = name,
-                Modifiers = modifiers,
-                Key = key,
-                Description = description
-            };
+            var hotkeyInfo = Models.HotkeyInfo.Create(id, name, modifiers, key, description);
             return RegisterHotkey(hotkeyInfo);
         }
 
-        public bool RegisterHotkey(HotkeyInfo hotkey)
+        public bool RegisterHotkey(Models.HotkeyInfo hotkey)
         {
             if (hotkey == null || string.IsNullOrWhiteSpace(hotkey.Id))
             {
@@ -101,7 +94,7 @@ namespace AIAnswerTool.Services
             {
                 try
                 {
-                    HotkeyInfo hotkeyInfo;
+                    Models.HotkeyInfo hotkeyInfo;
                     if (!_registeredHotkeys.TryGetValue(id, out hotkeyInfo))
                     {
                         _logService.LogWarn("Hotkey with ID '{0}' is not registered", id);
@@ -146,7 +139,7 @@ namespace AIAnswerTool.Services
 
             lock (_lockObject)
             {
-                HotkeyInfo hotkeyInfo;
+                Models.HotkeyInfo hotkeyInfo;
                 return _registeredHotkeys.TryGetValue(id, out hotkeyInfo) && hotkeyInfo.IsRegistered;
             }
         }
@@ -159,20 +152,45 @@ namespace AIAnswerTool.Services
             }
         }
 
-        public HotkeyInfo GetHotkey(string id)
+        /// <summary>
+        /// 检查热键是否处于活动状态（已注册且在系统中有效）
+        /// </summary>
+        /// <param name="hotkeyName">热键名称或ID</param>
+        /// <returns>热键是否活动</returns>
+        public bool IsHotkeyActive(string hotkeyName)
+        {
+            if (string.IsNullOrWhiteSpace(hotkeyName))
+                return false;
+
+            lock (_lockObject)
+            {
+                Models.HotkeyInfo hotkeyInfo;
+                if (_registeredHotkeys.TryGetValue(hotkeyName, out hotkeyInfo))
+                {
+                    // 检查是否已注册且服务已启用
+                    bool isActive = hotkeyInfo.IsRegistered && _isServiceEnabled;
+                    _logService.LogDebug("Hotkey '{0}' active status: {1}", hotkeyName, isActive);
+                    return isActive;
+                }
+                _logService.LogDebug("Hotkey '{0}' not found in registered hotkeys", hotkeyName);
+                return false;
+            }
+        }
+
+        public Models.HotkeyInfo GetHotkey(string id)
         {
             if (string.IsNullOrWhiteSpace(id))
                 return null;
 
             lock (_lockObject)
             {
-                HotkeyInfo hotkeyInfo;
+                Models.HotkeyInfo hotkeyInfo;
                 _registeredHotkeys.TryGetValue(id, out hotkeyInfo);
                 return hotkeyInfo;
             }
         }
 
-        public HotkeyInfo[] GetAllHotkeys()
+        public Models.HotkeyInfo[] GetAllHotkeys()
         {
             lock (_lockObject)
             {
@@ -184,7 +202,7 @@ namespace AIAnswerTool.Services
         {
             lock (_lockObject)
             {
-                HotkeyInfo hotkeyInfo;
+                Models.HotkeyInfo hotkeyInfo;
                 if (!_registeredHotkeys.TryGetValue(id, out hotkeyInfo))
                 {
                     _logService.LogWarn("Cannot update non-existent hotkey with ID '{0}'", id);
@@ -245,17 +263,38 @@ namespace AIAnswerTool.Services
 
         private void OnHotkeyPressed(object sender, NHotkey.HotkeyEventArgs e)
         {
-            if (!_isServiceEnabled) return;
+            if (!_isServiceEnabled)
+            {
+                _logService.LogWarn("Hotkey service is disabled, ignoring hotkey press: {0}", e.Name);
+                return;
+            }
 
             lock (_lockObject)
             {
-                HotkeyInfo hotkeyInfo;
+                Models.HotkeyInfo hotkeyInfo;
                 if (_registeredHotkeys.TryGetValue(e.Name, out hotkeyInfo))
                 {
-                    _logService.LogDebug("Hotkey triggered: {0}", e.Name);
-                    if (HotkeyPressed != null)
+                    _logService.LogInfo("Hotkey pressed: {0} ({1})", e.Name, hotkeyInfo.HotkeyString);
+                    
+                    // 记录触发信息
+                    hotkeyInfo.RecordTrigger();
+                    
+                    try
                     {
-                        HotkeyPressed(this, new HotkeyEventArgs(hotkeyInfo));
+                        if (HotkeyPressed != null)
+                        {
+                            var eventArgs = new Models.HotkeyEventArgs(hotkeyInfo);
+                            HotkeyPressed(this, eventArgs);
+                            _logService.LogDebug("Hotkey event '{0}' handled successfully", e.Name);
+                        }
+                        else
+                        {
+                            _logService.LogWarn("No handlers registered for hotkey event: {0}", e.Name);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logService.LogError("Error handling hotkey event '{0}': {1}", e.Name, ex.Message, ex);
                     }
                 }
                 else

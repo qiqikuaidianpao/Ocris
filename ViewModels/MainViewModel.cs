@@ -21,6 +21,7 @@ namespace AIAnswerTool.ViewModels
         private readonly ILogService _logService;
         private readonly IScreenshotService _screenshotService;
         private readonly IOCRService _ocrService;
+        private readonly IHotkeyService _hotkeyService;
         
         private string _questionText = "请输入题目或使用截图功能获取题目...";
         private string _answerText = "请输入题目并点击\"获取答案\"按钮...";
@@ -188,12 +189,13 @@ namespace AIAnswerTool.ViewModels
         public ICommand SettingsCommand { get; private set; }
         public ICommand TestConnectionCommand { get; private set; }
         public ICommand ScreenshotCommand { get; private set; }
+        public ICommand ClearHistoryCommand { get; private set; }
         
         #endregion
         
         #region Constructor
         
-        public MainViewModel(IAIService aiService, ILogService logService, IScreenshotService screenshotService, IOCRService ocrService)
+        public MainViewModel(IAIService aiService, ILogService logService, IScreenshotService screenshotService, IOCRService ocrService, IHotkeyService hotkeyService)
         {
             if (aiService == null)
             {
@@ -211,10 +213,15 @@ namespace AIAnswerTool.ViewModels
             {
                 throw new ArgumentNullException("ocrService");
             }
+            if (hotkeyService == null)
+            {
+                throw new ArgumentNullException("hotkeyService");
+            }
             _aiService = aiService;
             _logService = logService;
             _screenshotService = screenshotService;
             _ocrService = ocrService;
+            _hotkeyService = hotkeyService;
             
             // 初始化命令
             GetAnswerCommand = new RelayCommand(ExecuteGetAnswer, CanExecuteGetAnswer);
@@ -222,6 +229,7 @@ namespace AIAnswerTool.ViewModels
             SettingsCommand = new RelayCommand(ExecuteSettings, CanExecuteSettings);
             TestConnectionCommand = new RelayCommand(ExecuteTestConnection, CanExecuteTestConnection);
             ScreenshotCommand = new RelayCommand(ExecuteScreenshot, CanExecuteScreenshot);
+            ClearHistoryCommand = new RelayCommand(ExecuteClearHistory, CanExecuteClearHistory);
             
             // 初始化参考选项相关属性
             _choiceOptions = new ObservableCollection<ChoiceOption>();
@@ -232,6 +240,9 @@ namespace AIAnswerTool.ViewModels
             _judgmentIcon = "";
             _judgmentText = "";
             _finalAnswerText = "";
+            
+            // 初始化热键
+            InitializeHotkeys();
             
             _logService.Info("MainViewModel initialized");
         }
@@ -310,21 +321,36 @@ namespace AIAnswerTool.ViewModels
             return CanExecuteCommands;
         }
         
+        private static bool _isSettingsWindowOpen = false;
+        
         private void ExecuteSettings(object parameter)
         {
             try
             {
+                // 防止重复打开设置窗口
+                if (_isSettingsWindowOpen)
+                {
+                    _logService.Info("Settings window is already open");
+                    return;
+                }
+                
                 _logService.Info("Opening settings window");
+                _isSettingsWindowOpen = true;
                 
                 var settingsWindow = new AIAnswerTool.Views.SettingsWindow();
                 settingsWindow.Owner = System.Windows.Application.Current.MainWindow;
                 settingsWindow.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner;
+                
+                // 监听窗口关闭事件
+                settingsWindow.Closed += (s, e) => { _isSettingsWindowOpen = false; };
+                
                 settingsWindow.ShowDialog();
                 
                 _logService.Info("Settings window closed");
             }
             catch (Exception ex)
             {
+                _isSettingsWindowOpen = false;
                 _logService.Error(ex, "Failed to open settings window: {0}", ex.Message);
                 System.Windows.MessageBox.Show("打开设置窗口失败: " + ex.Message, "错误", 
                     System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
@@ -339,6 +365,26 @@ namespace AIAnswerTool.ViewModels
         private async void ExecuteTestConnection(object parameter)
         {
             await TestApiConnectionAsync();
+        }
+        
+        private bool CanExecuteClearHistory(object parameter)
+        {
+            return CanExecuteCommands;
+        }
+        
+        private void ExecuteClearHistory(object parameter)
+        {
+            try
+            {
+                _aiService.ClearHistory();
+                StatusText = "对话历史已清除";
+                _logService.Info("对话历史已清除");
+            }
+            catch (Exception ex)
+            {
+                _logService.Error(ex, "清除对话历史失败: {0}", ex.Message);
+                StatusText = "清除历史失败: " + ex.Message;
+            }
         }
         
         private bool CanExecuteScreenshot(object parameter)
@@ -650,6 +696,221 @@ namespace AIAnswerTool.ViewModels
             {
                 IsProcessing = false;
             }
+        }
+        
+        #endregion
+        
+        #region Hotkey Methods
+        
+        private void InitializeHotkeys()
+        {
+            try
+            {
+                // 绑定热键事件（在注册之前绑定）
+                _hotkeyService.HotkeyPressed += OnHotkeyPressed;
+                _hotkeyService.HotkeyRegistrationFailed += OnHotkeyRegistrationFailed;
+                
+                // 注册截图热键 (Alt+Q) 带重试机制
+                RegisterHotkeyWithRetry("screenshot", "截图", ModifierKeys.Alt, Key.Q, "快速截图并识别文字");
+                
+                // 注册唤醒窗口热键 (Alt+W)
+                RegisterHotkeyWithRetry("toggle_window", "唤醒窗口", ModifierKeys.Alt, Key.W, "显示/隐藏主窗口");
+                
+                // 注册设置热键 (Alt+S)
+                RegisterHotkeyWithRetry("settings", "设置", ModifierKeys.Alt, Key.S, "打开设置窗口");
+                
+                // 注册退出热键 (Alt+X)
+                RegisterHotkeyWithRetry("exit", "退出", ModifierKeys.Alt, Key.X, "退出程序");
+                
+                // 注册清除历史热键 (Alt+C)
+                RegisterHotkeyWithRetry("clear_history", "清除历史", ModifierKeys.Alt, Key.C, "清除对话历史");
+                
+                _logService.Info("热键初始化完成");
+            }
+            catch (Exception ex)
+            {
+                _logService.Error(ex, "热键初始化失败: {0}", ex.Message);
+            }
+        }
+        
+        private void RegisterHotkeyWithRetry(string id, string name, ModifierKeys modifiers, Key key, string description, int maxRetries = 3)
+        {
+            int retryCount = 0;
+            bool success = false;
+            
+            while (retryCount < maxRetries && !success)
+            {
+                try
+                {
+                    _logService.Info("尝试注册热键 '{0}' ({1}+{2})，第 {3} 次尝试", name, modifiers, key, retryCount + 1);
+                    
+                    // 检查热键是否可用
+                    if (!_hotkeyService.IsHotkeyAvailable(modifiers, key))
+                    {
+                        _logService.Warn("热键组合 {0}+{1} 已被占用，尝试替代方案", modifiers, key);
+                        
+                        // 尝试替代热键组合
+                        if (TryAlternativeHotkey(id, name, ref modifiers, ref key, description))
+                        {
+                            continue; // 使用新的热键组合重试
+                        }
+                        else
+                        {
+                            _logService.Error("无法找到可用的热键组合替代方案");
+                            break;
+                        }
+                    }
+                    
+                    success = _hotkeyService.RegisterHotkey(id, name, modifiers, key, description);
+                    
+                    if (success)
+                    {
+                        _logService.Info("热键 '{0}' ({1}+{2}) 注册成功", name, modifiers, key);
+                        
+                        // 验证热键是否真正活动
+                        if (_hotkeyService.IsHotkeyActive(id))
+                        {
+                            _logService.Info("热键 '{0}' 状态验证通过，处于活动状态", name);
+                        }
+                        else
+                        {
+                            _logService.Warn("热键 '{0}' 注册成功但状态验证失败", name);
+                        }
+                    }
+                    else
+                    {
+                        retryCount++;
+                        if (retryCount < maxRetries)
+                        {
+                            _logService.Warn("热键 '{0}' 注册失败，{1} 秒后重试", name, retryCount);
+                            System.Threading.Thread.Sleep(retryCount * 1000); // 递增延迟
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    retryCount++;
+                    _logService.Error(ex, "热键 '{0}' 注册异常，第 {1} 次尝试失败: {2}", name, retryCount, ex.Message);
+                    
+                    if (retryCount < maxRetries)
+                    {
+                        System.Threading.Thread.Sleep(retryCount * 1000);
+                    }
+                }
+            }
+            
+            if (!success)
+            {
+                _logService.Error("热键 '{0}' 注册最终失败，已尝试 {1} 次", name, maxRetries);
+            }
+        }
+        
+        private bool TryAlternativeHotkey(string id, string name, ref ModifierKeys modifiers, ref Key key, string description)
+        {
+            // 定义替代热键方案
+            var alternatives = new[]
+            {
+                new { Modifiers = ModifierKeys.Control | ModifierKeys.Alt, Key = Key.Q },
+                new { Modifiers = ModifierKeys.Shift | ModifierKeys.Alt, Key = Key.Q },
+                new { Modifiers = ModifierKeys.Alt, Key = Key.S },
+                new { Modifiers = ModifierKeys.Control | ModifierKeys.Shift, Key = Key.Q }
+            };
+            
+            foreach (var alt in alternatives)
+            {
+                if (_hotkeyService.IsHotkeyAvailable(alt.Modifiers, alt.Key))
+                {
+                    _logService.Info("找到可用的替代热键组合: {0}+{1}", alt.Modifiers, alt.Key);
+                    modifiers = alt.Modifiers;
+                    key = alt.Key;
+                    return true;
+                }
+            }
+            
+            return false;
+        }
+        
+        private void OnHotkeyPressed(object sender, Models.HotkeyEventArgs e)
+        {
+            try
+            {
+                _logService.Info("热键触发: {0}", e.HotkeyInfo.Name);
+                
+                // 根据热键ID执行相应操作
+                switch (e.HotkeyInfo.Id)
+                {
+                    case "screenshot":
+                        // 在UI线程中执行截图命令
+                        Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            if (CanExecuteScreenshot(null))
+                            {
+                                ExecuteScreenshot(null);
+                            }
+                        }));
+                        break;
+                    case "toggle_window":
+                        // 显示/隐藏主窗口
+                        Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            var mainWindow = Application.Current.MainWindow;
+                            if (mainWindow != null)
+                            {
+                                if (mainWindow.WindowState == WindowState.Minimized || !mainWindow.IsVisible)
+                                {
+                                    mainWindow.Show();
+                                    mainWindow.WindowState = WindowState.Normal;
+                                    mainWindow.Activate();
+                                }
+                                else
+                                {
+                                    mainWindow.Hide();
+                                }
+                            }
+                        }));
+                        break;
+                    case "settings":
+                        // 打开设置窗口
+                        Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            if (CanExecuteSettings(null))
+                            {
+                                ExecuteSettings(null);
+                            }
+                        }));
+                        break;
+                    case "exit":
+                        // 退出程序
+                        Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            Application.Current.Shutdown();
+                        }));
+                        break;
+                    case "clear_history":
+                        // 清除对话历史
+                        Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            if (CanExecuteClearHistory(null))
+                            {
+                                ExecuteClearHistory(null);
+                            }
+                        }));
+                        break;
+                    default:
+                        _logService.Warn("未知的热键ID: {0}", e.HotkeyInfo.Id);
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logService.Error(ex, "热键处理失败: {0}", ex.Message);
+            }
+        }
+        
+        private void OnHotkeyRegistrationFailed(object sender, string reason)
+        {
+            _logService.Error("热键注册失败: {0}", reason);
+            // 可以在这里显示用户通知
         }
         
         #endregion

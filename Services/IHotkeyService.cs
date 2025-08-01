@@ -1,70 +1,10 @@
 using System;
 using System.Windows.Input;
+using AIAnswerTool.Models;
 
 namespace AIAnswerTool.Services
 {
-    /// <summary>
-    /// 热键信息
-    /// </summary>
-    public class HotkeyInfo
-    {
-        /// <summary>
-        /// 热键ID
-        /// </summary>
-        public string Id { get; set; }
 
-        /// <summary>
-        /// 热键名称
-        /// </summary>
-        public string Name { get; set; }
-
-        /// <summary>
-        /// 修饰键
-        /// </summary>
-        public ModifierKeys Modifiers { get; set; }
-
-        /// <summary>
-        /// 按键
-        /// </summary>
-        public Key Key { get; set; }
-
-        /// <summary>
-        /// 描述
-        /// </summary>
-        public string Description { get; set; }
-
-        /// <summary>
-        /// 是否已注册
-        /// </summary>
-        public bool IsRegistered { get; set; }
-
-        /// <summary>
-        /// 热键字符串表示
-        /// </summary>
-        public string DisplayText { get { return string.Format("{0}+{1}", Modifiers, Key); } }
-    }
-
-    /// <summary>
-    /// 热键事件参数
-    /// </summary>
-    public class HotkeyEventArgs : EventArgs
-    {
-        /// <summary>
-        /// 热键信息
-        /// </summary>
-        public HotkeyInfo Hotkey { get; set; }
-
-        /// <summary>
-        /// 触发时间
-        /// </summary>
-        public DateTime TriggerTime { get; set; }
-
-        public HotkeyEventArgs(HotkeyInfo hotkey)
-        {
-            Hotkey = hotkey;
-            TriggerTime = DateTime.Now;
-        }
-    }
 
     /// <summary>
     /// 热键服务接口
@@ -117,17 +57,24 @@ namespace AIAnswerTool.Services
         bool IsHotkeyAvailable(ModifierKeys modifiers, Key key);
 
         /// <summary>
+        /// 检查热键是否处于活动状态（已注册且在系统中有效）
+        /// </summary>
+        /// <param name="hotkeyName">热键名称或ID</param>
+        /// <returns>热键是否活动</returns>
+        bool IsHotkeyActive(string hotkeyName);
+
+        /// <summary>
         /// 获取热键信息
         /// </summary>
         /// <param name="id">热键ID</param>
         /// <returns>热键信息</returns>
-        HotkeyInfo GetHotkey(string id);
+        Models.HotkeyInfo GetHotkey(string id);
 
         /// <summary>
         /// 获取所有已注册的热键
         /// </summary>
         /// <returns>热键列表</returns>
-        HotkeyInfo[] GetAllHotkeys();
+        Models.HotkeyInfo[] GetAllHotkeys();
 
         /// <summary>
         /// 更新热键
@@ -156,7 +103,7 @@ namespace AIAnswerTool.Services
         /// <summary>
         /// 热键触发事件
         /// </summary>
-        event EventHandler<HotkeyEventArgs> HotkeyPressed;
+        event EventHandler<Models.HotkeyEventArgs> HotkeyPressed;
 
         /// <summary>
         /// 热键注册失败事件

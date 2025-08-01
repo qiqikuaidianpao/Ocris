@@ -1,6 +1,7 @@
 using System;
 using System.Windows.Input;
 using Newtonsoft.Json;
+using AIAnswerTool.Utils;
 
 namespace AIAnswerTool.Models
 {
@@ -42,7 +43,7 @@ namespace AIAnswerTool.Models
         /// <summary>
         /// 是否启用
         /// </summary>
-        public bool IsEnabled { get; set; } = true;
+        public bool IsEnabled { get; set; }
 
         /// <summary>
         /// 注册时间
@@ -58,6 +59,14 @@ namespace AIAnswerTool.Models
         /// 触发次数
         /// </summary>
         public int TriggerCount { get; set; }
+
+        /// <summary>
+        /// 构造函数，设置默认值
+        /// </summary>
+        public HotkeyInfo()
+        {
+            IsEnabled = true;
+        }
 
         /// <summary>
         /// 热键字符串表示（如"Ctrl+Alt+Q"）
@@ -130,7 +139,9 @@ namespace AIAnswerTool.Models
         /// </summary>
         public static HotkeyInfo FromConfigString(string id, string name, string configString, string description = null)
         {
-            if (HotkeyParser.TryParse(configString, out var modifiers, out var key))
+            ModifierKeys modifiers;
+            Key key;
+            if (AIAnswerTool.Utils.HotkeyParser.TryParse(configString, out modifiers, out key))
             {
                 return Create(id, name, modifiers, key, description);
             }
@@ -170,7 +181,8 @@ namespace AIAnswerTool.Models
 
         public override bool Equals(object obj)
         {
-            if (obj is HotkeyInfo other)
+            var other = obj as HotkeyInfo;
+            if (other != null)
             {
                 return Modifiers == other.Modifiers && Key == other.Key;
             }
@@ -179,7 +191,13 @@ namespace AIAnswerTool.Models
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Modifiers, Key);
+            unchecked
+            {
+                int hash = 17;
+                hash = hash * 23 + Modifiers.GetHashCode();
+                hash = hash * 23 + Key.GetHashCode();
+                return hash;
+            }
         }
     }
 
@@ -188,15 +206,24 @@ namespace AIAnswerTool.Models
     /// </summary>
     public class HotkeyEventArgs : EventArgs
     {
+        private readonly HotkeyInfo _hotkeyInfo;
+        private readonly DateTime _triggerTime;
+
         /// <summary>
         /// 热键信息
         /// </summary>
-        public HotkeyInfo HotkeyInfo { get; }
+        public HotkeyInfo HotkeyInfo 
+        { 
+            get { return _hotkeyInfo; } 
+        }
 
         /// <summary>
         /// 触发时间
         /// </summary>
-        public DateTime TriggerTime { get; }
+        public DateTime TriggerTime 
+        { 
+            get { return _triggerTime; } 
+        }
 
         /// <summary>
         /// 是否已处理
@@ -210,8 +237,9 @@ namespace AIAnswerTool.Models
 
         public HotkeyEventArgs(HotkeyInfo hotkeyInfo)
         {
-            HotkeyInfo = hotkeyInfo ?? throw new ArgumentNullException(nameof(hotkeyInfo));
-            TriggerTime = DateTime.Now;
+            if (hotkeyInfo == null) throw new ArgumentNullException("hotkeyInfo");
+            _hotkeyInfo = hotkeyInfo;
+            _triggerTime = DateTime.Now;
         }
 
         public override string ToString()
@@ -229,49 +257,64 @@ namespace AIAnswerTool.Models
         /// 截图热键
         /// </summary>
         [JsonProperty("ScreenshotHotkey")]
-        public string ScreenshotHotkey { get; set; } = "Alt|Q";
+        public string ScreenshotHotkey { get; set; }
 
         /// <summary>
         /// 显示/隐藏主窗口热键
         /// </summary>
         [JsonProperty("ToggleMainWindowHotkey")]
-        public string ToggleMainWindowHotkey { get; set; } = "Ctrl|Alt|A";
+        public string ToggleMainWindowHotkey { get; set; }
 
         /// <summary>
         /// 退出程序热键
         /// </summary>
         [JsonProperty("ExitHotkey")]
-        public string ExitHotkey { get; set; } = "Ctrl|Alt|X";
+        public string ExitHotkey { get; set; }
 
         /// <summary>
         /// 设置窗口热键
         /// </summary>
         [JsonProperty("SettingsHotkey")]
-        public string SettingsHotkey { get; set; } = "Ctrl|Alt|S";
+        public string SettingsHotkey { get; set; }
 
         /// <summary>
         /// 清除历史热键
         /// </summary>
         [JsonProperty("ClearHistoryHotkey")]
-        public string ClearHistoryHotkey { get; set; } = "Ctrl|Alt|C";
+        public string ClearHistoryHotkey { get; set; }
 
         /// <summary>
         /// 是否启用热键
         /// </summary>
         [JsonProperty("EnableHotkeys")]
-        public bool EnableHotkeys { get; set; } = true;
+        public bool EnableHotkeys { get; set; }
 
         /// <summary>
         /// 是否显示热键冲突警告
         /// </summary>
         [JsonProperty("ShowConflictWarning")]
-        public bool ShowConflictWarning { get; set; } = true;
+        public bool ShowConflictWarning { get; set; }
 
         /// <summary>
         /// 热键响应延迟（毫秒）
         /// </summary>
         [JsonProperty("HotkeyDelay")]
-        public int HotkeyDelay { get; set; } = 100;
+        public int HotkeyDelay { get; set; }
+
+        /// <summary>
+        /// 构造函数，设置默认值
+        /// </summary>
+        public HotkeyConfig()
+        {
+            ScreenshotHotkey = "Alt|Q";
+            ToggleMainWindowHotkey = "Alt|W";
+            ExitHotkey = "Alt|X";
+            SettingsHotkey = "Alt|S";
+            ClearHistoryHotkey = "Alt|C";
+            EnableHotkeys = true;
+            ShowConflictWarning = true;
+            HotkeyDelay = 100;
+        }
 
         /// <summary>
         /// 获取默认配置
@@ -293,7 +336,9 @@ namespace AIAnswerTool.Models
                 if (string.IsNullOrWhiteSpace(config))
                     return false;
                     
-                if (!HotkeyParser.TryParse(config, out _, out _))
+                ModifierKeys modifiers;
+                Key key;
+                if (!AIAnswerTool.Utils.HotkeyParser.TryParse(config, out modifiers, out key))
                     return false;
             }
             
@@ -307,11 +352,11 @@ namespace AIAnswerTool.Models
         {
             var configs = new[]
             {
-                ("Screenshot", ScreenshotHotkey),
-                ("ToggleMainWindow", ToggleMainWindowHotkey),
-                ("Exit", ExitHotkey),
-                ("Settings", SettingsHotkey),
-                ("ClearHistory", ClearHistoryHotkey)
+                new { Name = "Screenshot", Hotkey = ScreenshotHotkey },
+                new { Name = "ToggleMainWindow", Hotkey = ToggleMainWindowHotkey },
+                new { Name = "Exit", Hotkey = ExitHotkey },
+                new { Name = "Settings", Hotkey = SettingsHotkey },
+                new { Name = "ClearHistory", Hotkey = ClearHistoryHotkey }
             };
 
             var duplicateList = new System.Collections.Generic.List<string>();
@@ -320,9 +365,9 @@ namespace AIAnswerTool.Models
             {
                 for (int j = i + 1; j < configs.Length; j++)
                 {
-                    if (configs[i].Item2 == configs[j].Item2)
+                    if (configs[i].Hotkey == configs[j].Hotkey)
                     {
-                        duplicateList.Add(string.Format("{0} 和 {1} 使用相同热键: {2}", configs[i].Item1, configs[j].Item1, configs[i].Item2));
+                        duplicateList.Add(string.Format("{0} 和 {1} 使用相同热键: {2}", configs[i].Name, configs[j].Name, configs[i].Hotkey));
                     }
                 }
             }

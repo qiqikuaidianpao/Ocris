@@ -202,7 +202,7 @@
                 </StackPanel>
                 
                 <!-- 快捷键提示 -->
-                <TextBlock Grid.Column="1" Text="快捷键: Ctrl+Alt+Q 唤醒窗口 | Ctrl+Alt+S 快速截图" 
+                <TextBlock Grid.Column="1" Text="快捷键: Alt+W 唤醒窗口 | Alt+Q 快速截图 | Alt+S 设置 | Alt+C 清除历史 | Alt+X 退出" 
                            FontSize="12" Foreground="#E8E8E8" VerticalAlignment="Center" 
                            HorizontalAlignment="Center" Margin="20,0"/>
                 

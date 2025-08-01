@@ -36,42 +36,57 @@ namespace AIAnswerTool.Models
         /// <summary>
         /// 最大令牌数
         /// </summary>
-        public int MaxTokens { get; set; } = 2000;
+        public int MaxTokens { get; set; }
 
         /// <summary>
         /// 温度参数（控制随机性）
         /// </summary>
-        public double Temperature { get; set; } = 0.7;
+        public double Temperature { get; set; }
 
         /// <summary>
         /// Top-p参数
         /// </summary>
-        public double TopP { get; set; } = 1.0;
+        public double TopP { get; set; }
 
         /// <summary>
         /// 频率惩罚
         /// </summary>
-        public double FrequencyPenalty { get; set; } = 0.0;
+        public double FrequencyPenalty { get; set; }
 
         /// <summary>
         /// 存在惩罚
         /// </summary>
-        public double PresencePenalty { get; set; } = 0.0;
+        public double PresencePenalty { get; set; }
 
         /// <summary>
         /// 是否流式输出
         /// </summary>
-        public bool Stream { get; set; } = false;
+        public bool Stream { get; set; }
 
         /// <summary>
         /// 请求时间戳
         /// </summary>
-        public DateTime Timestamp { get; set; } = DateTime.Now;
+        public DateTime Timestamp { get; set; }
 
         /// <summary>
         /// 额外参数
         /// </summary>
-        public Dictionary<string, object> ExtraParameters { get; set; } = new Dictionary<string, object>();
+        public Dictionary<string, object> ExtraParameters { get; set; }
+
+        /// <summary>
+        /// 构造函数，设置默认值
+        /// </summary>
+        public AIRequest()
+        {
+            MaxTokens = 2000;
+            Temperature = 0.7;
+            TopP = 1.0;
+            FrequencyPenalty = 0.0;
+            PresencePenalty = 0.0;
+            Stream = false;
+            Timestamp = DateTime.Now;
+            ExtraParameters = new Dictionary<string, object>();
+        }
 
         /// <summary>
         /// 验证请求参数

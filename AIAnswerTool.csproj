@@ -121,6 +121,7 @@
     <Compile Include="Models\AIResponse.cs" />
     <Compile Include="Models\ConfigModel.cs" />
     <Compile Include="Models\ChoiceOption.cs" />
+    <Compile Include="Models\HotkeyModels.cs" />
     <Compile Include="Services\IAIService.cs" />
     <Compile Include="Services\AIService.cs" />
     <Compile Include="Services\IOCRService.cs" />
@@ -140,6 +141,7 @@
     <Compile Include="ViewModels\SettingsViewModel.cs" />
     <Compile Include="Utils\RelayCommand.cs" />
     <Compile Include="Utils\LogExtensions.cs" />
+    <Compile Include="Utils\HotkeyParser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
