@@ -1,1 +1,1 @@
-& 'C:\Windows\Microsoft.NET\Framework64\v4.0.30319\MSBuild.exe' 'D:\BaiduNetdiskDownload\KaKaDaWPF1_0_0_3\AIAnswerTool\AIAnswerTool.csproj' /p:Configuration=Debug
+& 'C:\Windows\Microsoft.NET\Framework64\v4.0.30319\MSBuild.exe' '.\AIAnswerTool.csproj' /p:Configuration=Debug
