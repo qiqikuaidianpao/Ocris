@@ -1,0 +1,348 @@
+<Window x:Class="Ocris.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Ocris.Views"
+        mc:Ignorable="d"
+        Title="Ocris · 识界" Height="720" Width="1040"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="CanResize"
+        MinHeight="600" MinWidth="860"
+        Background="{DynamicResource WindowBackgroundBrush}"
+        Topmost="{Binding IsWindowTopmost}">
+
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+
+        <!-- 主按钮（颜色引用主题 DynamicResource）-->
+        <Style x:Key="PrimaryButton" TargetType="Button">
+            <Setter Property="Background" Value="{DynamicResource PrimaryBrush}"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Padding" Value="16,8"/>
+            <Setter Property="Margin" Value="6,0"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="bd" Background="{TemplateBinding Background}" CornerRadius="6" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="bd" Property="Background" Value="{DynamicResource PrimaryHoverBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="bd" Property="Opacity" Value="0.5"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="SecondaryButton" TargetType="Button">
+            <Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Padding" Value="14,8"/>
+            <Setter Property="Margin" Value="6,0"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderLightBrush}"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="bd" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="6" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="bd" Property="BorderBrush" Value="{DynamicResource PrimaryBrush}"/>
+                                <Setter TargetName="bd" Property="Background" Value="{DynamicResource PrimaryLightBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="bd" Property="Opacity" Value="0.5"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="DangerButton" TargetType="Button">
+            <Setter Property="Foreground" Value="{DynamicResource DangerBrush}"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Padding" Value="14,8"/>
+            <Setter Property="Margin" Value="6,0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="bd" Background="{DynamicResource SurfaceBrush}" BorderBrush="#FECACA" BorderThickness="1" CornerRadius="6" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="bd" Property="Background" Value="#FEF2F2"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="Card" TargetType="Border">
+            <Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/>
+            <Setter Property="CornerRadius" Value="10"/>
+            <Setter Property="Padding" Value="18"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderColorBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+
+        <Style x:Key="ModernTextBox" TargetType="TextBox">
+            <Setter Property="Padding" Value="12,10"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderLightBrush}"/>
+            <Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+            <Setter Property="CaretBrush" Value="{DynamicResource PrimaryBrush}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border x:Name="border" Background="{TemplateBinding Background}" BorderThickness="{TemplateBinding BorderThickness}"
+                                BorderBrush="{TemplateBinding BorderBrush}" CornerRadius="6">
+                            <ScrollViewer x:Name="PART_ContentHost" Focusable="false" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden" Margin="{TemplateBinding Padding}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="BorderBrush" Value="{DynamicResource TextMutedBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter TargetName="border" Property="BorderBrush" Value="{DynamicResource PrimaryBrush}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="OptionItemStyle" TargetType="Border">
+            <Setter Property="Background" Value="#FEF3E7"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="Padding" Value="12,8"/>
+            <Setter Property="Margin" Value="0,0,0,6"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsCorrect}" Value="True">
+                    <Setter Property="Background" Value="#ECFDF5"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- 顶栏 -->
+        <Border Grid.Row="0" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderColorBrush}" BorderThickness="0,0,0,1" Padding="20,12">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Border Width="32" Height="32" CornerRadius="8" Background="{DynamicResource PrimaryBrush}" Margin="0,0,12,0">
+                        <TextBlock Text="O" Foreground="White" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="Ocris" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                        <TextBlock Text="识界 · 截图 OCR 助手" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button Name="btnScreenshot" Content="📷 截图  Alt+Q" Style="{StaticResource PrimaryButton}" Command="{Binding ScreenshotCommand}"/>
+                    <Button Name="btnBatchOCR" Content="📂 批量OCR" Style="{StaticResource SecondaryButton}" Command="{Binding BatchOCRCommand}"/>
+                    <Button Name="btnQuickOCR" Content="⚡ 快速识别 F4" Style="{StaticResource SecondaryButton}" Command="{Binding QuickOCRCommand}"
+                            Visibility="{Binding IsAreaLocked, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                    <Button Name="btnLockArea" Content="🔒 锁定区域" Style="{StaticResource SecondaryButton}" Command="{Binding LockAreaCommand}"
+                            IsEnabled="{Binding CanExecuteCommands}"
+                            Visibility="{Binding HasScreenshot, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                    <Button Name="btnSettings" Content="⚙ 设置" Style="{StaticResource SecondaryButton}" Command="{Binding SettingsCommand}"/>
+                    <CheckBox Name="chkTopmost" Content="置顶" IsChecked="{Binding IsWindowTopmost}" VerticalAlignment="Center" Margin="10,0,0,0" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- 主内容：OCR 为主，AI 为辅 -->
+        <Grid Grid.Row="1" Margin="20,16">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="14"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- 上：识别文本（主） -->
+            <Border Grid.Row="0" Style="{StaticResource Card}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="10"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="12"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <Grid Grid.Row="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                            <Rectangle Width="3" Height="14" Fill="{DynamicResource PrimaryBrush}" Margin="0,0,8,0" RadiusX="1.5" RadiusY="1.5"/>
+                            <TextBlock Text="识别文本" FontSize="14" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center"/>
+                            <TextBlock Text="（截图 OCR / 粘贴 / 手动输入）" FontSize="11" Foreground="{DynamicResource TextFaintBrush}" VerticalAlignment="Center" Margin="6,0,0,0"/>
+                        </StackPanel>
+                        <ComboBox Grid.Column="2" Name="cmbQuestionType" Width="140" Height="30"
+                                  SelectedValue="{Binding SelectedQuestionType}" FontSize="12" Padding="8,4"
+                                  Background="{DynamicResource SurfaceBrush}" Foreground="{DynamicResource TextPrimaryBrush}">
+                            <ComboBoxItem Content="自动识别" Tag="Auto"/>
+                            <ComboBoxItem Content="选择题" Tag="Choice"/>
+                            <ComboBoxItem Content="填空题" Tag="FillBlank"/>
+                            <ComboBoxItem Content="问答题" Tag="QA"/>
+                            <ComboBoxItem Content="计算题" Tag="Calculation"/>
+                        </ComboBox>
+                    </Grid>
+
+                    <Border Grid.Row="2" Background="{DynamicResource SurfaceBrush}" CornerRadius="6" BorderThickness="1" BorderBrush="{DynamicResource BorderLightBrush}">
+                        <TextBox Name="txtQuestion" Style="{StaticResource ModernTextBox}" TextWrapping="Wrap" AcceptsReturn="True"
+                                 VerticalScrollBarVisibility="Auto" FontSize="14" BorderThickness="0"
+                                 Text="{Binding QuestionText, UpdateSourceTrigger=PropertyChanged}" Background="Transparent"/>
+                    </Border>
+
+                    <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button Name="btnClear" Content="清空" Style="{StaticResource DangerButton}" Command="{Binding ClearCommand}"/>
+                        <Button Name="btnTranslate" Content="🌐 翻译" Style="{StaticResource SecondaryButton}" Command="{Binding TranslateCommand}" IsEnabled="{Binding IsNotProcessing}"/>
+                        <Button Name="btnExplain" Content="💡 解释" Style="{StaticResource SecondaryButton}" Command="{Binding ExplainCommand}" IsEnabled="{Binding IsNotProcessing}"/>
+                        <Button Name="btnGetAnswer" Content="→ 智能解答" Style="{StaticResource PrimaryButton}" Command="{Binding GetAnswerCommand}" IsEnabled="{Binding IsNotProcessing}"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- 下：智能处理结果（辅） -->
+            <Border Grid.Row="2" Style="{StaticResource Card}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="12"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="10"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <Grid Grid.Row="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" Orientation="Horizontal">
+                            <Rectangle Width="3" Height="14" Fill="{DynamicResource SuccessBrush}" Margin="0,0,8,0" RadiusX="1.5" RadiusY="1.5"/>
+                            <TextBlock Text="智能处理结果" FontSize="14" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center"/>
+                            <TextBlock Text="（AI 答题 / 选项 / 解析）" FontSize="11" Foreground="{DynamicResource TextFaintBrush}" VerticalAlignment="Center" Margin="6,0,0,0"/>
+                        </StackPanel>
+                        <Button Grid.Column="1" Name="btnCopyAnswer" Content="📋 复制" Style="{StaticResource SecondaryButton}" Command="{Binding CopyAnswerCommand}" Padding="10,4" Margin="0"/>
+                    </Grid>
+
+                    <Border Grid.Row="2" Background="{DynamicResource SurfaceAltBrush}" CornerRadius="6" Padding="12" BorderBrush="{DynamicResource BorderColorBrush}" BorderThickness="1"
+                            Visibility="{Binding ChoiceOptionsVisibility, FallbackValue=Collapsed}">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" MaxHeight="160">
+                            <ItemsControl Name="icChoiceOptions" ItemsSource="{Binding ChoiceOptions}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Style="{StaticResource OptionItemStyle}">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="{Binding OptionLabel}" FontWeight="Bold" Margin="0,0,10,0" FontSize="15">
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="TextBlock">
+                                                            <Setter Property="Foreground" Value="{DynamicResource WarningBrush}"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding IsCorrect}" Value="True">
+                                                                    <Setter Property="Foreground" Value="{DynamicResource SuccessBrush}"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+                                                </TextBlock>
+                                                <TextBlock Text="{Binding OptionText}" TextWrapping="Wrap" FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                            </StackPanel>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </Border>
+
+                    <Border Grid.Row="2" Background="#ECFDF5" CornerRadius="6" Padding="12" BorderBrush="#A7F3D0" BorderThickness="1"
+                            Visibility="{Binding JudgmentAnswerVisibility}">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <TextBlock Text="{Binding JudgmentIcon}" FontSize="22" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                            <TextBlock Text="{Binding JudgmentText}" FontSize="17" FontWeight="Bold" Foreground="#059669" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Row="2" Background="#EFF6FF" CornerRadius="6" Padding="12" BorderBrush="#BFDBFE" BorderThickness="1"
+                            Visibility="{Binding OtherAnswerVisibility}">
+                        <TextBlock Text="{Binding FinalAnswerText}" TextWrapping="Wrap" FontSize="14" Foreground="#1D4ED8" FontWeight="Medium"/>
+                    </Border>
+
+                    <Border Grid.Row="4" Background="{DynamicResource SurfaceAltBrush}" CornerRadius="6" BorderThickness="1" BorderBrush="{DynamicResource BorderColorBrush}" Padding="14">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                            <TextBlock Name="txtAnswer" TextWrapping="Wrap" FontSize="14" Foreground="{DynamicResource TextPrimaryBrush}" Text="{Binding AnswerText}"/>
+                        </ScrollViewer>
+                    </Border>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- 底栏 -->
+        <Border Grid.Row="2" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderColorBrush}" BorderThickness="0,1,0,0" Padding="20,8">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Ellipse Width="7" Height="7" Fill="{DynamicResource SuccessBrush}" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                    <TextBlock Name="txtStatusBar" Text="{Binding StatusText}" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"/>
+                    <TextBlock Text="区域已锁定" Foreground="{DynamicResource SuccessBrush}" FontSize="12" Margin="16,0,0,0" VerticalAlignment="Center"
+                               Visibility="{Binding IsAreaLocked, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                    <Border Background="{DynamicResource SurfaceAltBrush}" CornerRadius="4" Padding="6" Margin="12,0,0,0"
+                            Visibility="{Binding IsAreaLocked, Converter={StaticResource BoolToVisibilityConverter}}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="预览" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                            <Image Name="imgPreview" Width="40" Height="28" Stretch="Fill" Source="{Binding LockedAreaPreview}"
+                                   ToolTip="点击查看大图" Cursor="Hand" MouseLeftButtonUp="ImgPreview_Click"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+                <TextBlock Grid.Column="1" Text="Alt+Q 截图 · F4 快速 · Alt+W 显隐 · Alt+S 设置 · Alt+X 退出" FontSize="11" Foreground="{DynamicResource TextFaintBrush}" VerticalAlignment="Center" Margin="0,0,16,0"/>
+                <TextBlock Grid.Column="2" Name="txtVersion" Text="Ocris v2.0.0" FontSize="11" Foreground="{DynamicResource TextFaintBrush}" VerticalAlignment="Center"/>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

@@ -1,0 +1,28 @@
+name: build
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Build (Release / x64)
+        run: msbuild Ocris.csproj /p:Configuration=Release /p:Platform=x64 /v:minimal /nologo
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Ocris-Release
+          path: bin/Release/
+          if-no-files-found: error

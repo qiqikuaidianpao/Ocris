@@ -1,0 +1,613 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>PaddleOCRSharp</name>
+    </assembly>
+    <members>
+        <member name="T:PaddleOCRSharp.EngineBase">
+            <summary>
+            引擎对象基类
+            </summary>
+        </member>
+        <member name="P:PaddleOCRSharp.EngineBase.PaddleOCRdllPath">
+            <summary>
+            PaddleOCR.dll自定义加载路径，默认为空，如果指定则需在引擎实例化前赋值。
+            </summary>
+        </member>
+        <member name="M:PaddleOCRSharp.EngineBase.#ctor">
+            <summary>
+            初始化
+            </summary>
+        </member>
+        <member name="M:PaddleOCRSharp.EngineBase.GetDllDirectory">
+            <summary>
+            获取程序的当前路径;
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:PaddleOCRSharp.EngineBase.GetRootDirectory">
+            <summary>
+            获取程序的当前路径;
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:PaddleOCRSharp.EngineBase.ImageToBytes(System.Drawing.Image)">
+            <summary>
+            Convert Image to Byte[]
+            </summary>
+            <param name="image"></param>
+            <returns></returns>
+        </member>
+        <member name="M:PaddleOCRSharp.EngineBase.Dispose">
+            <summary>
+            释放内存
+            </summary>
+        </member>
+        <member name="M:PaddleOCRSharp.EngineBase.GetLastError">
+            <summary>
+            获取底层错误信息
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:PaddleOCRSharp.JsonHelper">
+            <summary>
+            Json帮助类
+            </summary>
+        </member>
+        <member name="M:PaddleOCRSharp.JsonHelper.DeserializeObject``1(System.String)">
+            <summary>
+            Json反序列化
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="json"></param>
+            <returns></returns>
+        </member>
+        <member name="T:PaddleOCRSharp.OCRModelConfig">
+            <summary>
+            模型配置对象
+            </summary>
+        </member>
+        <member name="P:PaddleOCRSharp.OCRModelConfig.det_infer">
+            <summary>
+            det_infer模型路径
+            </summary>
+        </member>
+        <member name="P:PaddleOCRSharp.OCRModelConfig.cls_infer">
+            <summary>
+            cls_infer模型路径
+            </summary>
+        </member>
+        <member name="P:PaddleOCRSharp.OCRModelConfig.rec_infer">
+            <summary>
+            rec_infer模型路径
+            </summary>
+        </member>
+        <member name="P:PaddleOCRSharp.OCRModelConfig.keys">
+            <summary>
+            ppocr_keys.txt文件名全路径
+            </summary>
+        </member>
+        <member name="T:PaddleOCRSharp.StructureModelConfig">
+            <summary>
+            表格模型配置对象
+            </summary>
+        </member>
+        <member name="P:PaddleOCRSharp.StructureModelConfig.table_model_dir">
+            <summary>
+            table_model_dir模型路径
+            </summary>
+        </member>
+        <member name="P:PaddleOCRSharp.StructureModelConfig.table_char_dict_path">
+            <summary>
+            表格识别字典
+            </summary>
+        </member>
+        <member name="T:PaddleOCRSharp.OCRParameter">
+            <summary>
+            OCR识别参数
+            </summary>
+        </member>
+        <member name="P:PaddleOCRSharp.OCRParameter.use_gpu">
+            <summary>
+            是否使用GPU；默认false
+            </summary>
+        </member>
+        <member name="P:PaddleOCRSharp.OCRParameter.gpu_id">
+            <summary>
+            GPU id，使用GPU时有效；默认0;
+            </summary>
+        </member>
+        <member name="P:PaddleOCRSharp.OCRParameter.gpu_mem">
+            <summary>
+            申请的GPU内存;默认4000
+            </summary>
+        </member>
+        <member name="P:PaddleOCRSharp.OCRParameter.cpu_math_library_num_threads">
+            <summary>
+            CPU预测时的线程数，在机器核数充足的情况下，该值越大，预测速度越快；默认10
+            </summary>
+        </member>
+        <member name="P:PaddleOCRSharp.OCRParameter.enable_mkldnn">
+            <summary>
+            是否使用mkldnn库；默认true
+            </summary>
+        </member>
+        <member name="P:PaddleOCRSharp.OCRParameter.det">
+             <summary>
+            是否执行文字检测；默认true 
+             </summary>
+        </member>
+        <member name="P:PaddleOCRSharp.OCRParameter.rec">
+            <summary>
+            是否执行文字识别；默认true
+            </summary>
+        </member>
+        <member name="P:PaddleOCRSharp.OCRParameter.cls">
+            <summary>
+            是否执行文字方向分类；默认false
+            </summary>
+        </member>
+        <member name="P:PaddleOCRSharp.OCRParameter.max_side_len">
+            <summary>
+            输入图像长宽大于960时，等比例缩放图像，使得图像最长边为960,；默认960
+            </summary>
+        </member>
+        <member name="P:PaddleOCRSharp.OCRParameter.det_db_thresh">
+            <summary>
+            用于过滤DB预测的二值化图像，设置为0.-0.3对结果影响不明显；默认0.3
+            </summary>
+        </member>
+        <member name="P:PaddleOCRSharp.OCRParameter.det_db_box_thresh">
+            <summary>
+            DB后处理过滤box的阈值，如果检测存在漏框情况，可酌情减小；默认0.5
+            </summary>
+        </member>
+        <member name="P:PaddleOCRSharp.OCRParameter.det_db_unclip_ratio">
+            <summary>
+            表示文本框的紧致程度，越小则文本框更靠近文本;默认1.6
+            </summary>
+        </member>
+        <member name="P:PaddleOCRSharp.OCRParameter.use_dilation">
+            <summary>
+            是否在输出映射上使用膨胀,默认false
+            </summary>
+        </member>
+        <member name="P:PaddleOCRSharp.OCRParameter.det_db_score_mode">
+            <summary>
+            1:使用多边形框计算bbox score，0:使用矩形框计算。矩形框计算速度更快，多边形框对弯曲文本区域计算更准确。
+            </summary>
+        </member>
+        <member name="P:PaddleOCRSharp.OCRParameter.visualize">
+            <summary>
+            是否对结果进行可视化，为true时，预测结果会在当前目录下保存一个ocr_vis.png文件。默认false
+            </summary>
+        </member>
+        <member name="P:PaddleOCRSharp.OCRParameter.use_angle_cls">
+            <summary>
+            是否使用方向分类器,默认false
+            </summary>
+        </member>
+        <member name="P:PaddleOCRSharp.OCRParameter.cls_thresh">
+            <summary>
+            方向分类器的得分阈值，默认0.9
+            </summary>
+        </member>
+        <member name="P:PaddleOCRSharp.OCRParameter.cls_batch_num">
+            <summary>
+            方向分类器batchsize，默认1
+            </summary>
+        </member>
+        <member name="P:PaddleOCRSharp.OCRParameter.rec_batch_num">
+            <summary>
+            识别模型batchsize，默认6
+            </summary>
+        </member>
+        <member name="P:PaddleOCRSharp.OCRParameter.rec_img_h">
+            <summary>
+            识别模型输入图像高度，默认48
+            </summary>
+        </member>
+        <member name="P:PaddleOCRSharp.OCRParameter.rec_img_w">
+            <summary>
+            识别模型输入图像宽度，默认320
+            </summary>
+        </member>
+        <member name="P:PaddleOCRSharp.OCRParameter.show_img_vis">
+            <summary>
+            是否显示预测结果，默认false
+            </summary>
+        </member>
+        <member name="P:PaddleOCRSharp.OCRParameter.use_tensorrt">
+            <summary>
+            使用GPU预测时，是否启动tensorrt，默认false
+            </summary>
+        </member>
+        <member name="T:PaddleOCRSharp.ModifyParameter">
+            <summary>
+            OCR可修改参数
+            </summary>
+        </member>
+        <member name="P:PaddleOCRSharp.ModifyParameter.m_det">
+             <summary>
+            动态修改是否检测。在OCRParameter.det=true时，m_det可动态关闭参数det
+             </summary>
+        </member>
+        <member name="P:PaddleOCRSharp.ModifyParameter.m_rec">
+             <summary>
+            动态修改是否识别。在OCRParameter.rec=true时，m_rec可动态关闭参数rec
+             </summary>
+        </member>
+        <member name="P:PaddleOCRSharp.ModifyParameter.m_max_side_len">
+            <summary>
+            输入图像长宽大于960时，等比例缩放图像，使得图像最长边为960,；默认960
+            </summary>
+        </member>
+        <member name="P:PaddleOCRSharp.ModifyParameter.m_det_db_thresh">
+            <summary>
+            用于过滤DB预测的二值化图像，设置为0.-0.3对结果影响不明显；默认0.3。当m_det=true时有效
+            </summary>
+        </member>
+        <member name="P:PaddleOCRSharp.ModifyParameter.m_det_db_box_thresh">
+            <summary>
+            DB后处理过滤box的阈值，如果检测存在漏框情况，可酌情减小；默认0.5。当m_det=true时有效
+            </summary>
+        </member>
+        <member name="P:PaddleOCRSharp.ModifyParameter.m_det_db_unclip_ratio">
+            <summary>
+            表示文本框的紧致程度，越小则文本框更靠近文本;默认1.6。当m_det=true时有效
+            </summary>
+        </member>
+        <member name="T:PaddleOCRSharp.OCRResult">
+            <summary>
+            OCR识别结果
+            </summary>
+        </member>
+        <member name="P:PaddleOCRSharp.OCRResult.TextBlocks">
+            <summary>
+            文本块列表
+            </summary>
+        </member>
+        <member name="P:PaddleOCRSharp.OCRResult.Text">
+            <summary>
+            识别结果文本
+            </summary>
+        </member>
+        <member name="P:PaddleOCRSharp.OCRResult.JsonText">
+            <summary>
+            识别结果文本Json格式
+            </summary>
+        </member>
+        <member name="M:PaddleOCRSharp.OCRResult.ToString">
+            <summary>
+            返回字符串格式
+            </summary>
+        </member>
+        <member name="T:PaddleOCRSharp.TextBlock">
+            <summary>
+            识别的文本块
+            </summary>
+        </member>
+        <member name="P:PaddleOCRSharp.TextBlock.BoxPoints">
+            <summary>
+            文本块四周顶点坐标列表
+            </summary>
+        </member>
+        <member name="P:PaddleOCRSharp.TextBlock.Text">
+            <summary>
+            文本块文本
+            </summary>
+        </member>
+        <member name="P:PaddleOCRSharp.TextBlock.Score">
+             <summary>
+            文本识别置信度
+             </summary>
+        </member>
+        <member name="P:PaddleOCRSharp.TextBlock.cls_score">
+             <summary>
+            角度分类置信度
+             </summary>
+        </member>
+        <member name="P:PaddleOCRSharp.TextBlock.cls_label">
+             <summary>
+            角度分类标签
+             </summary>
+        </member>
+        <member name="M:PaddleOCRSharp.TextBlock.ToString">
+            <summary>
+            返回字符串格式
+            </summary>
+        </member>
+        <member name="T:PaddleOCRSharp.OCRPoint">
+            <summary>
+            点对象
+            </summary>
+        </member>
+        <member name="P:PaddleOCRSharp.OCRPoint.X">
+            <summary>
+            X坐标，单位像素
+            </summary>
+        </member>
+        <member name="P:PaddleOCRSharp.OCRPoint.Y">
+            <summary>
+            Y坐标，单位像素
+            </summary>
+        </member>
+        <member name="M:PaddleOCRSharp.OCRPoint.#ctor">
+             <summary>
+            默认构造函数
+             </summary>
+        </member>
+        <member name="M:PaddleOCRSharp.OCRPoint.#ctor(System.Int32,System.Int32)">
+            <summary>
+            构造函数
+            </summary>
+            <param name="x"></param>
+            <param name="y"></param>
+        </member>
+        <member name="M:PaddleOCRSharp.OCRPoint.ToString">
+            <summary>
+            返回字符串格式
+            </summary>
+        </member>
+        <member name="T:PaddleOCRSharp.OCRStructureResult">
+            <summary>
+            OCR结构化识别结果
+            </summary>
+        </member>
+        <member name="M:PaddleOCRSharp.OCRStructureResult.#ctor">
+            <summary>
+            表格识别结果
+            </summary>
+        </member>
+        <member name="P:PaddleOCRSharp.OCRStructureResult.RowCount">
+            <summary>
+            行数
+            </summary>
+        </member>
+        <member name="P:PaddleOCRSharp.OCRStructureResult.ColCount">
+            <summary>
+            列数
+            </summary>
+        </member>
+        <member name="P:PaddleOCRSharp.OCRStructureResult.Cells">
+            <summary>
+            单元格 列表
+            </summary>
+        </member>
+        <member name="P:PaddleOCRSharp.OCRStructureResult.TextBlocks">
+            <summary>
+            文本块列表
+            </summary>
+        </member>
+        <member name="T:PaddleOCRSharp.StructureCells">
+            <summary>
+            单元格
+            </summary>
+        </member>
+        <member name="M:PaddleOCRSharp.StructureCells.#ctor">
+            <summary>
+            单元格构造函数
+            </summary>
+        </member>
+        <member name="P:PaddleOCRSharp.StructureCells.Row">
+            <summary>
+            行数
+            </summary>
+        </member>
+        <member name="P:PaddleOCRSharp.StructureCells.Col">
+            <summary>
+            列数
+            </summary>
+        </member>
+        <member name="P:PaddleOCRSharp.StructureCells.TextBlocks">
+            <summary>
+            文本块
+            </summary>
+        </member>
+        <member name="P:PaddleOCRSharp.StructureCells.Text">
+            <summary>
+            识别文本
+            </summary>
+        </member>
+        <member name="T:PaddleOCRSharp.PaddleOCREngine">
+            <summary>
+            PaddleOCR文字识别引擎对象
+            </summary>
+        </member>
+        <member name="M:PaddleOCRSharp.PaddleOCREngine.#ctor">
+            <summary>
+            使用默认参数初始化OCR引擎对象
+            </summary>
+        </member>
+        <member name="M:PaddleOCRSharp.PaddleOCREngine.#ctor(PaddleOCRSharp.OCRModelConfig)">
+            <summary>
+            使用默认参数初始化OCR引擎对象
+            </summary>
+            <param name="config">模型配置对象，如果为空则按默认值</param>
+        </member>
+        <member name="M:PaddleOCRSharp.PaddleOCREngine.#ctor(PaddleOCRSharp.OCRModelConfig,PaddleOCRSharp.OCRParameter)">
+            <summary>
+            PaddleOCR识别引擎对象初始化
+            </summary>
+            <param name="config">模型配置对象，如果为空则按默认值</param>
+            <param name="parameter">识别参数，为空均按缺省值</param>
+        </member>
+        <member name="M:PaddleOCRSharp.PaddleOCREngine.#ctor(PaddleOCRSharp.OCRModelConfig,System.String)">
+            <summary>
+            PaddleOCR识别引擎对象初始化
+            </summary>
+            <param name="config">模型配置对象，如果为空则按默认值</param>
+            <param name="parameterjson">识别参数json字符串</param>
+        </member>
+        <member name="M:PaddleOCRSharp.PaddleOCREngine.GetDefaultConfig(System.String)">
+            <summary>
+            获取缺省配置
+            </summary>
+            <param name="rootpath">根目录</param>
+        </member>
+        <member name="M:PaddleOCRSharp.PaddleOCREngine.DetectText(System.String)">
+            <summary>
+            对图像文件进行文本识别
+            </summary>
+            <param name="imagefile">图像文件</param>
+            <returns>OCR识别结果</returns>
+        </member>
+        <member name="M:PaddleOCRSharp.PaddleOCREngine.DetectText(System.Drawing.Image)">
+             <summary>
+            对图像对象进行文本识别
+             </summary>
+             <param name="image">图像</param>
+             <returns>OCR识别结果</returns>
+        </member>
+        <member name="M:PaddleOCRSharp.PaddleOCREngine.DetectText(System.Byte[])">
+             <summary>
+            文本识别
+             </summary>
+             <param name="imagebyte">图像内存流</param>
+             <returns>OCR识别结果</returns>
+        </member>
+        <member name="M:PaddleOCRSharp.PaddleOCREngine.DetectTextBase64(System.String)">
+             <summary>
+            文本识别
+             </summary>
+             <param name="imagebase64">图像base64</param>
+             <returns>OCR识别结果</returns>
+        </member>
+        <member name="M:PaddleOCRSharp.PaddleOCREngine.ConvertResult(System.IntPtr)">
+            <summary>
+            结果解析
+            </summary>
+            <param name="ptrResult"></param>
+            <returns></returns>
+        </member>
+        <member name="M:PaddleOCRSharp.PaddleOCREngine.DetectStructure(System.Drawing.Image)">
+             <summary>
+            结构化文本识别
+             </summary>
+             <param name="image">图像</param>
+             <returns>表格识别结果</returns>
+        </member>
+        <member name="M:PaddleOCRSharp.PaddleOCREngine.getzeroindexs(System.Int32[],System.Int32)">
+            <summary>
+            计算表格分割
+            </summary>
+            <param name="pixellist"></param>
+            <param name="thresholdtozero"></param>
+            <returns></returns>
+        </member>
+        <member name="M:PaddleOCRSharp.PaddleOCREngine.ModifyParameter(PaddleOCRSharp.ModifyParameter)">
+            <summary>
+            在初始化后动态修改参数
+            </summary>
+            <param name="parameter">可修改参数对象</param>
+            <returns>是否成功，在初始化前调用会导致失败</returns>
+        </member>
+        <member name="M:PaddleOCRSharp.PaddleOCREngine.EnableDetUseRect(System.Boolean)">
+            <summary>
+            是否启用检测结果矩形处理,单个文字容易检测成菱形，处理成正矩形，以提高识别识别准确度。仅适用于水平文字。
+            </summary>
+            <param name="enable"></param>
+        </member>
+        <member name="M:PaddleOCRSharp.PaddleOCREngine.Dispose">
+            <summary>
+            释放对象
+            </summary>
+        </member>
+        <member name="T:PaddleOCRSharp.PaddleStructureEngine">
+            <summary>
+            PaddleOCR表格识别引擎对象
+            </summary>
+        </member>
+        <member name="M:PaddleOCRSharp.PaddleStructureEngine.#ctor">
+            <summary>
+            PaddleStructureEngine识别引擎对象初始化
+            </summary>
+        </member>
+        <member name="M:PaddleOCRSharp.PaddleStructureEngine.#ctor(PaddleOCRSharp.StructureModelConfig)">
+            <summary>
+            PaddleStructureEngine识别引擎对象初始化
+            </summary>
+            <param name="config">模型配置对象，如果为空则按默认值</param>
+        </member>
+        <member name="M:PaddleOCRSharp.PaddleStructureEngine.#ctor(PaddleOCRSharp.StructureModelConfig,PaddleOCRSharp.StructureParameter)">
+            <summary>
+            PaddleStructureEngine识别引擎对象初始化
+            </summary>
+            <param name="config">模型配置对象，如果为空则按默认值</param>
+            <param name="parameter">识别参数，为空均按缺省值</param>
+        </member>
+        <member name="M:PaddleOCRSharp.PaddleStructureEngine.#ctor(PaddleOCRSharp.StructureModelConfig,System.String)">
+            <summary>
+            PaddleStructureEngine识别引擎对象初始化
+            </summary>
+            <param name="config">模型配置对象，如果为空则按默认值</param>
+            <param name="parameterjson">识别参数Json格式，为空均按缺省值</param>
+        </member>
+        <member name="M:PaddleOCRSharp.PaddleStructureEngine.GetDefaultConfig(System.String)">
+            <summary>
+            获取缺省配置
+            </summary>
+            <param name="rootpath">根目录</param>
+        </member>
+        <member name="M:PaddleOCRSharp.PaddleStructureEngine.StructureDetectFile(System.String)">
+            <summary>
+            对图像文件进行表格文本识别
+            </summary>
+            <param name="imagefile">图像文件</param>
+            <returns>表格识别结果</returns>
+        </member>
+        <member name="M:PaddleOCRSharp.PaddleStructureEngine.StructureDetect(System.Drawing.Image)">
+             <summary>
+            对图像对象进行表格文本识别
+             </summary>
+             <param name="image">图像</param>
+             <returns>表格识别结果</returns>
+        </member>
+        <member name="M:PaddleOCRSharp.PaddleStructureEngine.StructureDetect(System.Byte[])">
+            <summary>
+            对图像Byte数组进行表格文本识别
+            </summary>
+            <param name="imagebyte">图像字节数组</param>
+            <returns>表格识别结果</returns>
+        </member>
+        <member name="M:PaddleOCRSharp.PaddleStructureEngine.StructureDetectBase64(System.String)">
+            <summary>
+            对图像Base64进行表格文本识别
+            </summary>
+            <param name="imagebase64">图像Base64</param>
+            <returns>表格识别结果</returns>
+        </member>
+        <member name="M:PaddleOCRSharp.PaddleStructureEngine.ConvertResult(System.IntPtr)">
+            <summary>
+            结果解析
+            </summary>
+            <param name="ptrResult"></param>
+            <returns></returns>
+        </member>
+        <member name="M:PaddleOCRSharp.PaddleStructureEngine.Dispose">
+            <summary>
+            释放对象
+            </summary>
+        </member>
+        <member name="T:PaddleOCRSharp.StructureParameter">
+            <summary>
+            OCR识别参数
+            </summary>
+        </member>
+        <member name="P:PaddleOCRSharp.StructureParameter.table_max_len">
+            <summary>
+            输入图像长宽大于488时，等比例缩放图像,默认488
+            </summary>
+        </member>
+        <member name="P:PaddleOCRSharp.StructureParameter.merge_no_span_structure">
+            <summary>
+            是否合并空单元格
+            </summary>
+        </member>
+        <member name="P:PaddleOCRSharp.StructureParameter.table_batch_num">
+            <summary>
+            批量识别数量
+            </summary>
+        </member>
+    </members>
+</doc>
