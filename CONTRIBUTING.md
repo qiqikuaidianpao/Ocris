@@ -46,15 +46,20 @@
 
 ## 🛠️ 本地构建
 
+**前置**：.NET Framework 4.8 SDK 或 Visual Studio 2019+（含「.NET 桌面开发」工作负载）。
+
 ```powershell
 .\build.ps1
-# 或
-MSBuild Ocris.csproj /p:Configuration=Debug
+# 或直接 MSBuild（项目在 src/Ocris/）
+MSBuild src\Ocris\Ocris.csproj /p:Configuration=Debug
 ```
 
-输出：`bin\Debug\Ocris.exe`
+输出：`src\Ocris\bin\Debug\Ocris.exe`
 
-> 首次运行需复制 `config.example.json` 为 `config.json` 并填入 AI API Key。
+**首次运行**：
+1. 复制 `config.example.json` 为 `config.json`（与 exe 同目录）+ 填入 AI API Key
+2. 放 PaddleOCR 推理模型到 `src\Ocris\bin\Debug\inference\`（详见 README「OCR 模型」）
+3. 运行 `Ocris.exe`
 
 ## 🎯 设计理念
 
