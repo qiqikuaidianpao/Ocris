@@ -1,0 +1,25 @@
+<Application x:Class="Ocris.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:Ocris">
+    <Application.Resources>
+        <!-- 全局资源定义 -->
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!-- 现代化按钮样式 -->
+                <ResourceDictionary Source="Styles/ModernButtonStyles.xaml"/>
+                <!-- Material Design 主题资源 -->
+                <!-- 这里将在安装MaterialDesignThemes包后添加 -->
+            </ResourceDictionary.MergedDictionaries>
+            
+            <!-- 全局样式 -->
+            <Style x:Key="BaseWindowStyle" TargetType="Window">
+                <Setter Property="WindowStyle" Value="SingleBorderWindow"/>
+                <Setter Property="ResizeMode" Value="CanResize"/>
+                <Setter Property="WindowStartupLocation" Value="CenterScreen"/>
+            </Style>
+
+            <!-- ToolBarButton样式已移至全局样式文件 Styles/ModernButtonStyles.xaml -->
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

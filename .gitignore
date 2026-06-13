@@ -1,0 +1,40 @@
+# 构建产物
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+*.pdb
+
+# IDE / 编辑器
+.vs/
+.vscode/
+.ace-tool/
+.trae/
+*.user
+*.suo
+*.userosscache
+
+# NuGet
+*.nupkg
+packages/
+
+# 日志 / 临时
+*.log
+*.tmp
+*.temp
+*.cache
+*.bak
+*.backup
+
+# 系统
+Thumbs.db
+.DS_Store
+
+# 本地配置（含 API Key，不入库 —— 运行时自动生成默认配置）
+config.json
+!config.example.json
+
+# 内部文档（不入库）
+一些建议.txt
+规划任务/

@@ -1,0 +1,39 @@
+{
+  "Token": "",
+  "ApiBaseUrl": "https://api.openai.com/v1",
+  "ScreenShotKeys": "F1",
+  "ClipBoardKeys": "F2",
+  "WinTopMust": true,
+  "AutoSaveScreenshots": false,
+  "ScreenshotPath": "Screenshots",
+  "LogLevel": "Information",
+  "LogPath": "Logs",
+  "CurrentModel": "gpt-3.5-turbo",
+  "SystemPrompt": "你是一个专业的答题助手，请根据题目内容提供准确的答案。",
+  "RequestTimeout": 30,
+  "EnableProxy": false,
+  "ProxyAddress": "",
+  "ProxyPort": 0,
+  "WindowOpacity": 0.95,
+  "AlwaysOnTop": true,
+  "MinimizeToTray": true,
+  "StartWithWindows": false,
+  "AliCloudApiKey": "",
+  "AliCloudApiBaseUrl": "https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generation",
+  "Theme": "Light",
+  "Hotkeys": {
+    "Screenshot": "Alt+Q",
+    "Clear": "Alt+C",
+    "QuickOCR": "F4",
+    "ToggleWindow": "Alt+W",
+    "Settings": "Alt+S",
+    "Exit": "Alt+X"
+  },
+  "FixedArea": {
+    "IsEnabled": false,
+    "X": 0,
+    "Y": 0,
+    "Width": 0,
+    "Height": 0
+  }
+}
