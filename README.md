@@ -64,7 +64,7 @@ MSBuild src\Ocris\Ocris.csproj /p:Configuration=Release /p:Platform=x64
    ```
 3. 运行 `Ocris.exe`
 
-> 也直接从 [GitHub Release](https://github.com/qiqikuaidianpao/Ocris/releases) 下载预编译包（含模型，下载即用）。
+> 也直接从 [GitHub Release](https://github.com/Ocris-App/Ocris/releases) 下载预编译包（含模型，下载即用）。
 
 ### 配置
 
